@@ -13,6 +13,7 @@ rshell.SOURCE := \
     rshell/SequentialCommand.cpp \
     rshell/ConjunctiveCommand.cpp \
     rshell/DisjunctiveCommand.cpp \
+    rshell/Tokenizer.cpp \
     rshell/main.cpp
 rshell.OBJECT := $(patsubst %.cpp,%.o,$(rshell.SOURCE))
 rshell.DEPEND := $(patsubst %.cpp,%.d,$(rshell.SOURCE))
