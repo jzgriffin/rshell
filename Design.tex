@@ -170,16 +170,22 @@
   word.
 
   \subsubsection{Interface}
-  \lstinputlisting[firstline=36,lastline=50]{Interfaces.hpp}
+  \lstinputlisting[firstline=36,lastline=55]{Interfaces.hpp}
 
   \subsubsection{Members}
   \begin{itemize}
     \item \texttt{input}: The input stream to tokenize.
     \item \texttt{tokens}: The produced sequence of tokens.
+    \item \texttt{inEscape}: Whether or not the tokenization terminated
+      during an escape sequence.
+    \item \texttt{inQuote}: Whether or not the tokenization terminated
+      during a quote sequence.
   \end{itemize}
 
   \subsubsection{Methods}
   \begin{itemize}
+    \item \texttt{isValid}: Returns a value indicating whether or not
+      the tokenization terminated normally.
     \item \texttt{apply}: Repeatedly tokenizes until the end of the
       input stream is reached, returning the produced tokens.
     \item \texttt{next}: Obtains the next token from the stream.  If
@@ -198,7 +204,7 @@
   \lstinputlisting[language=]{Grammar.ebnf}
 
   \subsubsection{Interface}
-  \lstinputlisting[firstline=52,lastline=61]{Interfaces.hpp}
+  \lstinputlisting[firstline=57,lastline=66]{Interfaces.hpp}
 
   \subsubsection{Members}
   \begin{itemize}
@@ -219,7 +225,7 @@
   executed.
 
   \subsubsection{Interface}
-  \lstinputlisting[firstline=93,lastline=104]{Interfaces.hpp}
+  \lstinputlisting[firstline=98,lastline=109]{Interfaces.hpp}
 
   \subsubsection{Members}
   \begin{itemize}
@@ -242,7 +248,7 @@
   The first command within a command chain.
 
   \subsubsection{Interface}
-  \lstinputlisting[firstline=106,lastline=115]{Interfaces.hpp}
+  \lstinputlisting[firstline=111,lastline=118]{Interfaces.hpp}
 
   \subsubsection{Methods}
   \begin{itemize}
@@ -255,7 +261,7 @@
   A command to be executed unconditionally within a command chain.
 
   \subsubsection{Interface}
-  \lstinputlisting[firstline=115,lastline=122]{Interfaces.hpp}
+  \lstinputlisting[firstline=120,lastline=127]{Interfaces.hpp}
 
   \subsubsection{Methods}
   \begin{itemize}
@@ -269,7 +275,7 @@
   with a zero exit code.
 
   \subsubsection{Interface}
-  \lstinputlisting[firstline=124,lastline=131]{Interfaces.hpp}
+  \lstinputlisting[firstline=129,lastline=136]{Interfaces.hpp}
 
   \subsubsection{Methods}
   \begin{itemize}
@@ -280,7 +286,7 @@
   \subsection{\texttt{DisjunctiveCommand}}
 
   \subsubsection{Interface}
-  \lstinputlisting[firstline=133,lastline=140]{Interfaces.hpp}
+  \lstinputlisting[firstline=138,lastline=145]{Interfaces.hpp}
 
   A command to be executed if the preceding command exited
   unsuccessfully with a nonzero exit code.
@@ -304,7 +310,7 @@
   instance to perform the execution of commands.
 
   \subsubsection{Interface}
-  \lstinputlisting[firstline=63,lastline=75]{Interfaces.hpp}
+  \lstinputlisting[firstline=68,lastline=80]{Interfaces.hpp}
 
   \subsubsection{Members}
   \begin{itemize}
@@ -329,7 +335,7 @@
   perform the actual execution of a single command.
 
   \subsubsection{Interface}
-  \lstinputlisting[firstline=77,lastline=83]{Interfaces.hpp}
+  \lstinputlisting[firstline=82,lastline=88]{Interfaces.hpp}
 
   \subsubsection{Methods}
   \begin{itemize}
@@ -343,7 +349,7 @@
   through POSIX system calls.
 
   \subsubsection{Interface}
-  \lstinputlisting[firstline=85,lastline=91]{Interfaces.hpp}
+  \lstinputlisting[firstline=90,lastline=96]{Interfaces.hpp}
 
   \subsubsection{Methods}
   \begin{itemize}

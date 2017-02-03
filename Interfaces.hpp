@@ -39,12 +39,17 @@ public:
     explicit Tokenizer(std::istream& input);
 
     const std::vector<Token>& tokens() const noexcept;
+    bool inEscape() const noexcept;
+    bool inQuote() const noexcept;
+    bool isValid() const noexcept;
 
     const std::vector<Token>& apply();
 
 private:
     std::istream& _input;
     std::vector<Token> _tokens;
+    bool _inEscape;
+    bool _inQuote;
 
     Token next();
 };
