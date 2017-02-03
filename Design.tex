@@ -383,10 +383,14 @@
   % Roadblocks
   \section{Roadblocks}
 
-  For this assignment, the design is reasonably well-defined, and I do
-  not foresee any roadblocks in its implementation.  However, there
-  could potentially be issues inherent to the design that hamper the
-  extensibility of the system.
+  The primary roadblock that might be encountered in this design, within
+  the scope of the assignment, is the implementation of command
+  associativity or grouping with respect to conjunctive, disjunctive,
+  and sequential command chains.  This problem is currently addressed in
+  the design of the execution algorithm, though this solution may prove
+  inadequate, necessitating a change to the composite design for the
+  command structure, introducing a \texttt{CommandGroup} composite class
+  and organizing commands into groups during the parsing phase.
 
   A common feature of shells is builtin commands, such as \texttt{alias}
   in bash and zsh.  To implement these, the most straightforward
