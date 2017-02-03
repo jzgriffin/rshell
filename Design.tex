@@ -169,6 +169,10 @@
   quotes, backslashes, and other special characters as elements of a
   word.
 
+  If a comment character (\#) is encountered during the tokenization
+  process, the remainder of the characters on the line, up to the next
+  line feed, are discarded.
+
   \subsubsection{Interface}
   \lstinputlisting[firstline=36,lastline=55]{Interfaces.hpp}
 
@@ -402,11 +406,5 @@
   accomplished using a set of \texttt{Executor} instances in the
   \texttt{Execution}, which then delegates work to the appropriate
   executor depending on the nature of each \texttt{Command}.
-
-  Another feature that is not directly addressed in this specification
-  is command comments, which are necessary for this assignment.  A
-  likely point of implementation for this feature is within the
-  \texttt{Tokenizer} class, whose language could be extended to discard
-  all characters after a comment token.
 
 \end{document}

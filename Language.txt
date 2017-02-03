@@ -1,3 +1,4 @@
+Comment = #.*
 Sequence = ;
 Conjunction = &&
 Disjunction = \|\|
