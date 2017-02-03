@@ -294,11 +294,14 @@
   \subsection{\texttt{Execution}}
 
   This class represents the algorithm for executing commands in the
-  strategy pattern.  It continues to execute subsequent commands in a
-  chain as long as the \texttt{shouldExecuteAfter} continues to return
-  true given the results of the preceding command.  It uses its internal
-  \texttt{Executor} instance to perform the actual execution of
-  commands.
+  strategy pattern.  It attempts to execute all commands in a chain,
+  using the results of the preceding command to determine whether the
+  subsequent command should truly be executed.  Commands that indicate
+  that they should not be executed are skipped, treating the last
+  executed command as the preceding command for the next.  It uses the
+  \texttt{shouldExecuteAfter} method on each command to determine
+  whether it should be executed and its internal \texttt{Executor}
+  instance to perform the execution of commands.
 
   \subsubsection{Interface}
   \lstinputlisting[firstline=63,lastline=75]{Interfaces.hpp}
