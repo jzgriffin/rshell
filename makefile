@@ -9,6 +9,10 @@ endif
 rshell.TARGET := bin/rshell
 rshell.SOURCE := \
     rshell/Command.cpp \
+    rshell/InitialCommand.cpp \
+    rshell/SequentialCommand.cpp \
+    rshell/ConjunctiveCommand.cpp \
+    rshell/DisjunctiveCommand.cpp \
     rshell/main.cpp
 rshell.OBJECT := $(patsubst %.cpp,%.o,$(rshell.SOURCE))
 rshell.DEPEND := $(patsubst %.cpp,%.d,$(rshell.SOURCE))
