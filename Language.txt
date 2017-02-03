@@ -1,4 +1,6 @@
 Sequence = ;
 Conjunction = &&
 Disjunction = \|\|
-Word = ([^\s"\\]|\\.)?("([^"\\]|\\.)")?([^\s"\\]|\\.)?
+DirectWord = [^\s"\\]|\\.
+QuotedWord = "([^"\\]|\\.)"
+Word = (DirectWord|QuotedWord)+
