@@ -1,0 +1,4 @@
+Sequence = ;
+Conjunction = &&
+Disjunction = \|\|
+Word = ([^\s"\\]|\\.)?("([^"\\]|\\.)")?([^\s"\\]|\\.)?
