@@ -81,7 +81,8 @@
   appended to the command string.  If the previous line terminated with
   a backslash, the next line is joined to the command string directly.
   If the previous line was terminated in the middle of a quoted string,
-  the next line is joined with a line terminator.
+  the next line is joined with a line terminator.  This process may be
+  repeated any number of times.
 
   \subsubsection{Interface}
   \lstinputlisting[firstline=1,lastline=19]{Interfaces.hpp}
