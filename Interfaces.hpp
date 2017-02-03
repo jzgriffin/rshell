@@ -82,7 +82,7 @@ private:
 class Executor
 {
 public:
-    virtual ~PosixExecutor();
+    virtual ~Executor();
 
     virtual int execute(const Command& command) = 0;
 };
