@@ -8,6 +8,7 @@ endif
 
 rshell.TARGET := bin/rshell
 rshell.SOURCE := \
+    rshell/Command.cpp \
     rshell/main.cpp
 rshell.OBJECT := $(patsubst %.cpp,%.o,$(rshell.SOURCE))
 rshell.DEPEND := $(patsubst %.cpp,%.d,$(rshell.SOURCE))
