@@ -16,6 +16,7 @@ rshell.SOURCE := \
     rshell/Tokenizer.cpp \
     rshell/Parser.cpp \
     rshell/Executor.cpp \
+    rshell/PosixExecutor.cpp \
     rshell/main.cpp
 rshell.OBJECT := $(patsubst %.cpp,%.o,$(rshell.SOURCE))
 rshell.DEPEND := $(patsubst %.cpp,%.d,$(rshell.SOURCE))
