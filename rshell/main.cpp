@@ -4,7 +4,9 @@
 // Quarter:    Winter 2017
 // Assignment: Assignment 2
 
+#include "Shell.hpp"
+
 int main(int argc, char** argv)
 {
-    return 0;
+    return rshell::Shell{}.run();
 }
