@@ -12,6 +12,8 @@
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
+#include <limits.h>
+#include <unistd.h>
 
 using utility::make_unique;
 
@@ -43,7 +45,17 @@ int Shell::run()
 
 void Shell::printCommandPrompt() const
 {
-    std::cout << "$ ";
+    char username[LOGIN_NAME_MAX];
+    if (getlogin_r(username, sizeof username) != 0) {
+        throw std::runtime_error{"unable to get username"};
+    }
+
+    char hostname[HOST_NAME_MAX];
+    if (gethostname(hostname, sizeof hostname) != 0) {
+        throw std::runtime_error{"unable to get hostname"};
+    }
+
+    std::cout << username << '@' << hostname << "$ ";
 }
 
 void Shell::printContinuationPrompt() const
