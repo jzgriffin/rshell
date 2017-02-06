@@ -20,6 +20,7 @@ rshell.SOURCE := \
     src/Execution.cpp \
     src/Shell.cpp \
     src/ExitException.cpp \
+    src/ArgVector.cpp \
     src/main.cpp
 rshell.OBJECT := $(patsubst %.cpp,%.o,$(rshell.SOURCE))
 rshell.DEPEND := $(patsubst %.cpp,%.d,$(rshell.SOURCE))

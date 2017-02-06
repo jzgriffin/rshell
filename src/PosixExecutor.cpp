@@ -15,60 +15,12 @@
 // SOFTWARE.
 
 #include "PosixExecutor.hpp"
+#include "ArgVector.hpp"
 #include <cstdio>
 #include <cstdlib>
-#include <cstring>
-#include <iostream>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
-
-namespace {
-
-/// \brief Converts a STL string to a unique pointer to a C string
-/// \param string STL string to convert
-/// \return unique pointer to equivalent C string
-std::unique_ptr<char[]> toCString(const std::string& string)
-{
-    auto size = string.size() + 1;
-    auto cString = std::unique_ptr<char[]>(new char[size]);
-    std::memcpy(cString.get(), string.c_str(), size);
-    return cString;
-}
-
-/// \brief Converts a vector of STL strings to a vector of unique pointers to
-/// C strings
-/// \param strings STL strings to convert
-/// \return vector of unique pointers to equivalent C strings
-std::vector<std::unique_ptr<char[]>> toCStrings(
-        const std::vector<std::string>& strings)
-{
-    std::vector<std::unique_ptr<char[]>> cStrings;
-    for (auto&& string : strings) {
-        cStrings.push_back(toCString(string));
-    }
-
-    return cStrings;
-}
-
-/// \brief Converts a program name and argument vector to a C-style argument
-/// vector
-/// \param program program name
-/// \param args argument vector
-/// \return C-style argument vector
-///
-/// The new argument vector has a null pointer at its back.
-std::vector<std::unique_ptr<char[]>> toArgv(
-        const std::string& program,
-        const std::vector<std::string>& args)
-{
-    auto argv = toCStrings(args);
-    argv.insert(std::begin(argv), toCString(program));
-    argv.push_back(nullptr);
-    return argv;
-}
-
-}
 
 namespace rshell {
 
@@ -76,14 +28,8 @@ PosixExecutor::~PosixExecutor() = default;
 
 int PosixExecutor::execute(const Command& command)
 {
-    // Convert the command program name and arguments to a C-style argv array
-    // First create the owning array, then create a non-owning array from it
-    // for use with the system calls
-    auto argvOwner = toArgv(command.program, command.arguments);
-    std::vector<char*> argv;
-    for (auto&& arg : argvOwner) {
-        argv.push_back(arg.get());
-    }
+    // Create an argv-style C array to pass to the system call
+    ArgVector argv{command.program, command.arguments};
 
     // Fork the process.  If the fork is successful, there will be two
     // identical processes running at the same point on the next line of code.
@@ -95,7 +41,7 @@ int PosixExecutor::execute(const Command& command)
     if (pid == 0) {
         // Invoke the exit system call, replacing the current process image
         // with the given executable
-        execvp(argv[0], argv.data());
+        execvp(argv[0], argv);
 
         // Under normal conditions, exec does not return.  However, if an
         // error occurred, it will return, leaving us in the forked child
