@@ -15,6 +15,7 @@
 // SOFTWARE.
 
 #include "Shell.hpp"
+#include "ExitException.hpp"
 #include "Parser.hpp"
 #include "PosixExecutor.hpp"
 #include "Tokenizer.hpp"
@@ -153,11 +154,11 @@ int Shell::execute(const Command& command)
     try {
         return _execution.execute(command);
     }
-    catch (int e) {
+    catch (const ExitException& e) {
         // The exit command throws an integer when it is executed.  We
         // use this integer as the exit code for the shell process
         _isRunning = false;
-        _exitCode = e;
+        _exitCode = e.exitCode();
         return _exitCode;
     }
     catch (const std::exception& e) {

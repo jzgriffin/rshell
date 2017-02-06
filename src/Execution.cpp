@@ -15,6 +15,7 @@
 // SOFTWARE.
 
 #include "Execution.hpp"
+#include "ExitException.hpp"
 #include <iostream>
 #include <stdexcept>
 #include <utility>
@@ -79,11 +80,8 @@ void Execution::handleExit(const Command& command)
         }
     }
 
-    // NOTE: It would be cleaner to add a new exception type such as
-    // ExitException to make this throw-to-exit process type-safe, or add a
-    // different communication channel between the Execution and the shell
-    // while preserving Execution's agnosticism of the Shell class
-    throw exitCode;
+    // Throw the exit exception expected by the shell
+    throw ExitException{exitCode};
 }
 
 } // namespace rshell
