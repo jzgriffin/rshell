@@ -1,5 +1,5 @@
 CXX ?= g++
-CXXFLAGS := $(CXXFLAGS) -std=c++11 -I.
+CXXFLAGS := $(CXXFLAGS) -Wall -Werror -pedantic -std=c++11
 ifeq ($(BUILD),release)
     CXXFLAGS := $(CXXFLAGS) -DNDEBUG -O2
 else
@@ -8,18 +8,18 @@ endif
 
 rshell.TARGET := bin/rshell
 rshell.SOURCE := \
-    rshell/Command.cpp \
-    rshell/InitialCommand.cpp \
-    rshell/SequentialCommand.cpp \
-    rshell/ConjunctiveCommand.cpp \
-    rshell/DisjunctiveCommand.cpp \
-    rshell/Tokenizer.cpp \
-    rshell/Parser.cpp \
-    rshell/Executor.cpp \
-    rshell/PosixExecutor.cpp \
-    rshell/Execution.cpp \
-    rshell/Shell.cpp \
-    rshell/main.cpp
+    src/Command.cpp \
+    src/InitialCommand.cpp \
+    src/SequentialCommand.cpp \
+    src/ConjunctiveCommand.cpp \
+    src/DisjunctiveCommand.cpp \
+    src/Tokenizer.cpp \
+    src/Parser.cpp \
+    src/Executor.cpp \
+    src/PosixExecutor.cpp \
+    src/Execution.cpp \
+    src/Shell.cpp \
+    src/main.cpp
 rshell.OBJECT := $(patsubst %.cpp,%.o,$(rshell.SOURCE))
 rshell.DEPEND := $(patsubst %.cpp,%.d,$(rshell.SOURCE))
 
@@ -27,6 +27,18 @@ rshell.DEPEND := $(patsubst %.cpp,%.d,$(rshell.SOURCE))
 all: all-rshell
 clean: clean-rshell
 distclean: distclean-rshell
+	$(RM) -r bin
+
+bin:
+	mkdir -p bin
+
+.PHONY: doc all-doc clean-doc distclean-doc
+doc:
+	doxygen doc/Doxyfile
+all-doc: doc
+clean-doc:
+	$(RM) -r doc/output
+distclean-doc: doc
 
 .PHONY: rshell all-rshell clean-rshell distclean-rshell
 rshell: all-rshell
@@ -36,8 +48,8 @@ clean-rshell:
 	$(RM) $(rshell.DEPEND)
 distclean-rshell: clean-rshell
 	$(RM) $(rshell.TARGET)
-$(rshell.TARGET): $(rshell.OBJECT)
-	$(CXX) $(CXXFLAGS) -o $@ $^
+$(rshell.TARGET): bin $(rshell.OBJECT)
+	$(CXX) $(CXXFLAGS) -o $@ $(rshell.OBJECT)
 -include $(rshell.DEPEND)
 
 %.o: %.cpp makefile
