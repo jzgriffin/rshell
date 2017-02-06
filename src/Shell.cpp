@@ -27,6 +27,14 @@
 #include <limits.h>
 #include <unistd.h>
 
+#if !defined(HOST_NAME_MAX) && defined(_POSIX_HOST_NAME_MAX)
+#   define HOST_NAME_MAX _POSIX_HOST_NAME_MAX
+#endif
+
+#if !defined(LOGIN_NAME_MAX) && defined(_POSIX_LOGIN_NAME_MAX)
+#   define LOGIN_NAME_MAX _POSIX_LOGIN_NAME_MAX
+#endif
+
 using utility::make_unique;
 
 namespace rshell {
