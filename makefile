@@ -42,6 +42,13 @@ clean-doc:
 	$(RM) -r doc/output
 distclean-doc: doc
 
+.PHONY: test all-test clean-test distclean-test
+test:
+	sh tests/all.sh
+all-test: test
+clean-test:
+distclean-test:
+
 .PHONY: rshell all-rshell clean-rshell distclean-rshell
 rshell: all-rshell
 all-rshell: $(rshell.TARGET)
