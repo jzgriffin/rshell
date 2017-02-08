@@ -22,7 +22,6 @@
 
 #include "Command.hpp"
 #include "Executor.hpp"
-#include <memory>
 
 namespace rshell {
 
@@ -33,15 +32,20 @@ public:
     /// \brief Constructs a new instance of the \ref Execution class with the
     /// given executor
     /// \param executor executor to apply to commands
-    explicit Execution(std::unique_ptr<Executor>&& executor);
+    ///
+    /// The Execution takes ownership of \p executor.
+    explicit Execution(Executor* executor);
+
+    /// \brief Destructs the \ref Execution instance.
+    ~Execution();
 
     /// \brief Gets a reference to the executor to apply to commands
     /// \return reference to the executor to apply to commands
-    const Executor& executor() const noexcept { return *_executor; }
+    const Executor& executor() const { return *_executor; }
 
     /// \brief Gets a reference to the executor to apply to commands
     /// \return reference to the executor to apply to commands
-    Executor& executor() noexcept { return *_executor; }
+    Executor& executor() { return *_executor; }
 
     /// \brief Executes the given command structure
     /// \param command initial command to execute
@@ -54,7 +58,7 @@ public:
     int execute(const Command& command);
 
 private:
-    std::unique_ptr<Executor> _executor; //!< Executor to apply to commands
+    Executor* _executor; //!< Executor to apply to commands
 
     /// \brief Handles the exit command
     /// \param command command representing the exit

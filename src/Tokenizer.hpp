@@ -39,28 +39,28 @@ public:
     /// \brief Gets a reference to the sequence of tokens
     /// \return reference to the sequence of tokens
     /// \see apply
-    const std::vector<Token>& tokens() const noexcept { return _tokens; }
+    const std::vector<Token>& tokens() const { return _tokens; }
 
     /// \brief Gets a value indicating whether or not the tokenization
     /// terminated during an escape sequence
     /// \return whether or not the tokenization terminated during an escape
     /// sequence
     /// \see isValid
-    bool inEscape() const noexcept { return _inEscape; }
+    bool inEscape() const { return _inEscape; }
 
     /// \brief Gets a value indicating whether or not the tokenization
     /// terminated during a quote sequence
     /// \return whether or not the tokenization terminated during a quote
     /// sequence
     /// \see isValid
-    bool inQuote() const noexcept { return _inQuote; }
+    bool inQuote() const { return _inQuote; }
 
     /// \brief Gets a value indicating whether or not the tokenization
     /// terminated normally
     /// \return whether or not the tokenization terminated normally
     /// \see inEscape
     /// \see inQuote
-    bool isValid() const noexcept;
+    bool isValid() const;
 
     /// \brief Repeatedly tokenizes the input stream until its end is reached
     /// \return reference to the sequence of tokens
@@ -76,11 +76,11 @@ private:
 
     /// \brief Whether or not the tokenization terminated during an escape
     /// sequence
-    bool _inEscape{false};
+    bool _inEscape;
 
     /// \brief Whether or not the tokenization terminated during a quote
     /// sequence
-    bool _inQuote{false};
+    bool _inQuote;
 
     /// \brief Obtains the next token from the stream
     /// \return next token from the stream

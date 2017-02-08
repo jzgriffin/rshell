@@ -35,7 +35,7 @@ public:
     /// \brief Executes the individual command given
     /// \param command command to execute
     /// \return exit code of the command
-    virtual int execute(const Command& command) override;
+    virtual int execute(const Command& command);
 };
 
 } // namespace rshell

@@ -18,10 +18,12 @@
 
 namespace rshell {
 
-SequentialCommand::~SequentialCommand() = default;
+SequentialCommand::~SequentialCommand()
+{
+}
 
 bool SequentialCommand::shouldExecuteAfter(const Command& command,
-        int exitCode) const noexcept
+        int exitCode) const
 {
     return true;
 }

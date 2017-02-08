@@ -19,10 +19,7 @@
 #include "DisjunctiveCommand.hpp"
 #include "InitialCommand.hpp"
 #include "SequentialCommand.hpp"
-#include "utility/make_unique.hpp"
 #include <stdexcept>
-
-using utility::make_unique;
 
 namespace rshell {
 
@@ -31,16 +28,17 @@ Parser::Parser(const std::vector<Token>& tokens)
 {
 }
 
-std::unique_ptr<Command> Parser::apply()
+Command* Parser::apply()
 {
-    std::unique_ptr<Command> initial;
-    Command* current = nullptr;
-    for (auto&& token : _tokens) {
+    Command* initial = 0;
+    Command* current = 0;
+    for (std::vector<Token>::const_iterator token = _tokens.begin();
+            token != _tokens.end(); ++token) {
         // If the initial command has not yet been created, it must be
         // instantiated and made current
-        if (initial == nullptr) {
-            initial = make_unique<InitialCommand>();
-            current = initial.get();
+        if (initial == 0) {
+            initial = new InitialCommand();
+            current = initial;
         }
 
         // If the current command does not yet have a program name, the
@@ -50,29 +48,31 @@ std::unique_ptr<Command> Parser::apply()
         // according to the type of connective represented by the current
         // token
         if (current->program.empty()) {
-            if (token.type != Token::Type::Word) {
-                throw std::runtime_error{"command must start with word"};
+            if (token->type != TokenWord) {
+                delete initial;
+                throw std::runtime_error("command must start with word");
             }
 
-            current->program = token.text;
+            current->program = token->text;
         }
-        else if (token.type == Token::Type::Word) {
-            current->arguments.push_back(token.text);
+        else if (token->type == TokenWord) {
+            current->arguments.push_back(token->text);
         }
-        else if (token.type == Token::Type::Sequence) {
-            current->next = make_unique<SequentialCommand>();
-            current = current->next.get();
+        else if (token->type == TokenSequence) {
+            current->next = new SequentialCommand();
+            current = current->next;
         }
-        else if (token.type == Token::Type::Conjunction) {
-            current->next = make_unique<ConjunctiveCommand>();
-            current = current->next.get();
+        else if (token->type == TokenConjunction) {
+            current->next = new ConjunctiveCommand();
+            current = current->next;
         }
-        else if (token.type == Token::Type::Disjunction) {
-            current->next = make_unique<DisjunctiveCommand>();
-            current = current->next.get();
+        else if (token->type == TokenDisjunction) {
+            current->next = new DisjunctiveCommand();
+            current = current->next;
         }
         else {
-            throw std::runtime_error{"unexpected token"};
+            delete initial;
+            throw std::runtime_error("unexpected token");
         }
     }
 

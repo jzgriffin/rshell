@@ -18,6 +18,11 @@
 
 namespace rshell {
 
-Command::~Command() = default;
+Command::~Command()
+{
+    if (next != 0) {
+        delete next;
+    }
+}
 
 } // namespace rshell

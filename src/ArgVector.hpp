@@ -42,37 +42,37 @@ public:
     /// \brief Gets a pointer to a string in the argv array
     /// \param i index of string
     /// \return pointer to argument string
-    const char* operator[](std::size_t i) const noexcept { return _argv[i]; }
+    const char* operator[](std::size_t i) const { return _argv[i]; }
 
     /// \brief Gets a pointer to a string in the argv array
     /// \param i index of string
     /// \return pointer to argument string
-    char* operator[](std::size_t i) noexcept { return _argv[i]; }
+    char* operator[](std::size_t i) { return _argv[i]; }
 
     /// \brief Gets the pointer to the argv array
     /// \return pointer to argv array
-    operator const char* const*() const noexcept { return argv(); }
+    operator const char* const*() const { return argv(); }
 
     /// \brief Gets the pointer to the argv array
     /// \return pointer to argv array
-    operator char* const*() noexcept { return argv(); }
+    operator char* const*() { return argv(); }
 
     /// \brief Gets a reference to the program string
     /// \return reference to the program string
-    const std::string& program() const noexcept { return _program; }
+    const std::string& program() const { return _program; }
 
     /// \brief Gets a reference to the argument strings
     /// \return reference to the argument strings
-    const std::vector<std::string>& arguments() const noexcept
+    const std::vector<std::string>& arguments() const
     { return _arguments; }
 
     /// \brief Gets the pointer to the argv array
     /// \return pointer to argv array
-    const char* const* argv() const noexcept { return _argv.data(); }
+    const char* const* argv() const { return _argv.data(); }
 
     /// \brief Gets the pointer to the argv array
     /// \return pointer to argv array
-    char* const* argv() noexcept { return _argv.data(); }
+    char* const* argv() { return _argv.data(); }
 
     /// \brief Updates the argument vector with the given program string and
     /// argument strings

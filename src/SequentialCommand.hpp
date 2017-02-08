@@ -39,7 +39,7 @@ public:
     ///
     /// Always returns true, as a sequential command is always executed.
     virtual bool shouldExecuteAfter(const Command& command,
-            int exitCode) const noexcept override;
+            int exitCode) const;
 };
 
 } // namespace rshell

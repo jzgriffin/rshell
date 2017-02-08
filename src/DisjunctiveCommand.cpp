@@ -18,10 +18,12 @@
 
 namespace rshell {
 
-DisjunctiveCommand::~DisjunctiveCommand() = default;
+DisjunctiveCommand::~DisjunctiveCommand()
+{
+}
 
 bool DisjunctiveCommand::shouldExecuteAfter(const Command& command,
-        int exitCode) const noexcept
+        int exitCode) const
 {
     return exitCode != 0;
 }

@@ -38,7 +38,7 @@ public:
     /// \param exitCode exit code of the preceding command
     /// \return \c true if \p exitCode is zero
     virtual bool shouldExecuteAfter(const Command& command,
-            int exitCode) const noexcept override;
+            int exitCode) const;
 };
 
 } // namespace rshell

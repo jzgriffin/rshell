@@ -29,11 +29,11 @@ public:
     /// \brief Constructs a new instance of the \ref ExitException class with
     /// the given exit code
     /// \param exitCode exit code for the shell process
-    explicit ExitException(int exitCode = 0);
+    ExitException(int exitCode = 0);
 
     /// \brief Gets the exit code for the shell process
     /// \return exit code for the shell process
-    int exitCode() const noexcept { return _exitCode; }
+    int exitCode() const { return _exitCode; }
 
 private:
     int _exitCode; //!< Exit code for the shell process

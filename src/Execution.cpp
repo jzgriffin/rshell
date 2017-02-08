@@ -16,32 +16,39 @@
 
 #include "Execution.hpp"
 #include "ExitException.hpp"
+#include <cstdlib>
 #include <iostream>
 #include <stdexcept>
-#include <utility>
 
 namespace rshell {
 
-Execution::Execution(std::unique_ptr<Executor>&& executor)
-    : _executor{std::move(executor)}
+Execution::Execution(Executor* executor)
+    : _executor(executor)
 {
-    if (_executor == nullptr) {
-        throw std::runtime_error{"null executor in Execution"};
+    if (_executor == 0) {
+        throw std::runtime_error("null executor in Execution");
+    }
+}
+
+Execution::~Execution()
+{
+    if (_executor != 0) {
+        delete _executor;
     }
 }
 
 int Execution::execute(const Command& command)
 {
     int exitCode = 0;
-    const Command* previous = nullptr;
+    const Command* previous = 0;
 
     // Loop over the command composition, starting with the first
-    for (auto current = &command; current != nullptr;
-            current = current->next.get()) {
+    for (const Command* current = &command; current != 0;
+            current = current->next) {
         // If there was a previously executed command (ie, this is not
         // the first), do not execute if the command itself indicates
         // that it should not follow the previous command
-        if (previous != nullptr
+        if (previous != 0
                 && !current->shouldExecuteAfter(*previous, exitCode)) {
             continue;
         }
@@ -68,7 +75,7 @@ void Execution::handleExit(const Command& command)
     // code of the shell
     if (!command.arguments.empty()) {
         try {
-            exitCode = std::stoi(command.arguments.front());
+            exitCode = std::atoi(command.arguments.front().c_str());
         }
         catch (...) {
             // std::stoi throws when conversion is impossible; we do not
@@ -81,7 +88,7 @@ void Execution::handleExit(const Command& command)
     }
 
     // Throw the exit exception expected by the shell
-    throw ExitException{exitCode};
+    throw ExitException(exitCode);
 }
 
 } // namespace rshell

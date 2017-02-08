@@ -18,10 +18,12 @@
 
 namespace rshell {
 
-InitialCommand::~InitialCommand() = default;
+InitialCommand::~InitialCommand()
+{
+}
 
 bool InitialCommand::shouldExecuteAfter(const Command& command,
-        int exitCode) const noexcept
+        int exitCode) const
 {
     return false;
 }

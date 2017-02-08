@@ -15,6 +15,7 @@
 // SOFTWARE.
 
 #include "Tokenizer.hpp"
+#include <cstdio>
 #include <istream>
 #include <locale>
 #include <map>
@@ -30,20 +31,45 @@ namespace {
 /// own literal equivalent.
 char unescape(char c)
 {
-    static std::map<char, char> codes{
-        {'a', '\a'},
-        {'e', 0x33},
-        {'n', '\n'},
-        {'r', '\r'},
-        {'t', '\t'},
-    };
+    static std::map<char, char> codes;
+    if (codes.empty()) {
+        codes['a'] = '\a';
+        codes['e'] = 0x33;
+        codes['n'] = '\n';
+        codes['r'] = '\r';
+        codes['t'] = '\t';
+    }
 
-    auto iter = codes.find(c);
-    if (iter == std::end(codes)) {
+    std::map<char, char>::const_iterator iter = codes.find(c);
+    if (iter == codes.end()) {
         return c;
     }
 
     return iter->second;
+}
+
+bool isDirect(char c, const std::locale& loc, bool inQuote)
+{
+    // Determine whether the next character in the input is a direct
+    // word symbol, meaning that it is not a quotation mark or, if
+    // outside of a quote, a white space character or other special
+    // punctuation mark
+
+    if (c == EOF || c == '"') {
+        return false;
+    }
+
+    if (!inQuote) {
+        if (std::isspace<char>(c, loc)) {
+            return false;
+        }
+
+        if (c == '#' || c == ';' || c == '&' || c == '|') {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 }
@@ -52,10 +78,12 @@ namespace rshell {
 
 Tokenizer::Tokenizer(std::istream& input)
     : _input(input)
+    , _inEscape(false)
+    , _inQuote(false)
 {
 }
 
-bool Tokenizer::isValid() const noexcept
+bool Tokenizer::isValid() const
 {
     return !(_inEscape || _inQuote);
 }
@@ -65,9 +93,9 @@ const std::vector<Token>& Tokenizer::apply()
     // Continue tokenizing until the next token has no type, signalling
     // the end of tokenizable input
 
-    auto token = next();
-    while (token.type != Token::Type::None) {
-        _tokens.push_back(std::move(token));
+    Token token = next();
+    while (token.type != TokenNone) {
+        _tokens.push_back(token);
         token = next();
     }
 
@@ -76,7 +104,8 @@ const std::vector<Token>& Tokenizer::apply()
 
 Token Tokenizer::next()
 {
-    auto token = Token{Token::Type::None};
+    Token token;
+    token.type = TokenNone;
 
     // Ignore all white space and comments before the next token
     do {
@@ -128,7 +157,7 @@ bool Tokenizer::nextSequence(Token& token)
     }
 
     token.text += _input.get();
-    token.type = Token::Type::Sequence;
+    token.type = TokenSequence;
     return true;
 }
 
@@ -142,11 +171,11 @@ bool Tokenizer::nextConjunction(Token& token)
 
     token.text += _input.get();
     if (_input.peek() != '&') {
-        throw std::runtime_error{"unexpected &"};
+        throw std::runtime_error("unexpected &");
     }
 
     token.text += _input.get();
-    token.type = Token::Type::Conjunction;
+    token.type = TokenConjunction;
     return true;
 }
 
@@ -160,11 +189,11 @@ bool Tokenizer::nextDisjunction(Token& token)
 
     token.text += _input.get();
     if (_input.peek() != '|') {
-        throw std::runtime_error{"unexpected |"};
+        throw std::runtime_error("unexpected |");
     }
 
     token.text += _input.get();
-    token.type = Token::Type::Disjunction;
+    token.type = TokenDisjunction;
     return true;
 }
 
@@ -173,7 +202,7 @@ bool Tokenizer::nextWord(Token& token)
     // Word tokens consist of a mixture of one or more direct or quoted
     // words in sequence
 
-    auto result = false;
+    bool result = false;
     while (nextDirectWord(token) || nextQuoteWord(token)) {
         result = true;
     }
@@ -183,36 +212,12 @@ bool Tokenizer::nextWord(Token& token)
 
 bool Tokenizer::nextDirectWord(Token& token)
 {
-    auto loc = _input.getloc();
-    auto isDirect = [&]()
-    {
-        // Determine whether the next character in the input is a direct
-        // word symbol, meaning that it is not a quotation mark or, if
-        // outside of a quote, a white space character or other special
-        // punctuation mark
-
-        auto c = _input.peek();
-        if (c == EOF || c == '"') {
-            return false;
-        }
-
-        if (!_inQuote) {
-            if (std::isspace<char>(c, loc)) {
-                return false;
-            }
-
-            if (c == '#' || c == ';' || c == '&' || c == '|') {
-                return false;
-            }
-        }
-
-        return true;
-    };
+    std::locale loc = _input.getloc();
 
     // Extract as many direct word symbols as possible
-    auto count = 0;
-    while (isDirect()) {
-        auto c = _input.get();
+    std::size_t count = 0;
+    while (isDirect(_input.peek(), loc, _inQuote)) {
+        int c = _input.get();
         if (c == '\\') {
             // Process the escape sequence
 
@@ -238,7 +243,7 @@ bool Tokenizer::nextDirectWord(Token& token)
         return false;
     }
 
-    token.type = Token::Type::Word;
+    token.type = TokenWord;
     return true;
 }
 
@@ -263,7 +268,7 @@ bool Tokenizer::nextQuoteWord(Token& token)
     _inQuote = false;
     _input.get();
 
-    token.type = Token::Type::Word;
+    token.type = TokenWord;
     return true;
 }
 

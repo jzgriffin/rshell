@@ -18,6 +18,8 @@
 
 namespace rshell {
 
-Executor::~Executor() = default;
+Executor::~Executor()
+{
+}
 
 } // namespace rshell

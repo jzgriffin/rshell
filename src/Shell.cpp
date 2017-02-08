@@ -19,7 +19,6 @@
 #include "Parser.hpp"
 #include "PosixExecutor.hpp"
 #include "Tokenizer.hpp"
-#include "utility/make_unique.hpp"
 #include <cstdio>
 #include <iostream>
 #include <sstream>
@@ -35,14 +34,15 @@
 #   define LOGIN_NAME_MAX _POSIX_LOGIN_NAME_MAX
 #endif
 
-using utility::make_unique;
-
 namespace rshell {
 
 Shell::Shell()
-    : _input{&std::cin}
-    , _execution{make_unique<PosixExecutor>()}
-    , _commandPrompt{buildCommandPrompt()}
+    : _isInteractive(true)
+    , _input(&std::cin)
+    , _isRunning(false)
+    , _exitCode(0)
+    , _execution(new PosixExecutor())
+    , _commandPrompt(buildCommandPrompt())
 {
 }
 
@@ -58,9 +58,17 @@ void Shell::setInput(std::istream& input)
 
 void Shell::process()
 {
-    auto command = getCommand();
-    if (command != nullptr) {
-        execute(*command);
+    Command* command = getCommand();
+    if (command != 0) {
+        try {
+            execute(*command);
+        }
+        catch (...) {
+            delete command;
+            throw;
+        }
+
+        delete command;
     }
 }
 
@@ -134,13 +142,14 @@ std::vector<Token> Shell::readCommand() const
         std::string line;
         if (!std::getline(*_input, line)) {
             // If the end of the input stream is reached, the shell will exit
-            return {};
+            tokens.clear();
+            return tokens;
         }
 
         text += line;
 
-        std::istringstream is{text};
-        Tokenizer tokenizer{is};
+        std::istringstream is(text);
+        Tokenizer tokenizer(is);
         tokenizer.apply();
 
         if (tokenizer.isValid()) {
@@ -150,7 +159,7 @@ std::vector<Token> Shell::readCommand() const
 
         printContinuationPrompt();
         if (tokenizer.inEscape()) {
-            text.pop_back(); // Remove backslash
+            text.erase(--text.end()); // Remove backslash
         }
         else if (tokenizer.inQuote()) {
             text += '\n';
@@ -166,14 +175,15 @@ std::vector<Token> Shell::promptCommand() const
     return readCommand();
 }
 
-std::unique_ptr<Command> Shell::getCommand() const
+Command* Shell::getCommand() const
 {
-    auto tokens = promptCommand();
+    std::vector<Token> tokens = promptCommand();
     if (tokens.empty()) {
-        return nullptr;
+        return 0;
     }
 
-    return Parser{tokens}.apply();
+    Parser parser(tokens);
+    return parser.apply();
 }
 
 int Shell::execute(const Command& command)

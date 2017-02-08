@@ -40,7 +40,7 @@ public:
     /// Always returns false, as an initial command should never come after
     /// another command.
     virtual bool shouldExecuteAfter(const Command& command,
-            int exitCode) const noexcept override;
+            int exitCode) const;
 };
 
 } // namespace rshell

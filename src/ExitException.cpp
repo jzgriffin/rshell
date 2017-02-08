@@ -19,7 +19,7 @@
 namespace rshell {
 
 ExitException::ExitException(int exitCode)
-    : _exitCode{exitCode}
+    : _exitCode(exitCode)
 {
 }
 

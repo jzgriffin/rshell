@@ -1,5 +1,5 @@
 CXX ?= g++
-CXXFLAGS := $(CXXFLAGS) -Wall -Werror -pedantic -std=c++11
+CXXFLAGS := $(CXXFLAGS) -Wall -Werror -pedantic -ansi
 ifeq ($(BUILD),release)
     CXXFLAGS := $(CXXFLAGS) -DNDEBUG -O2
 else

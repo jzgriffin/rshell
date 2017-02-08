@@ -15,13 +15,12 @@
 // SOFTWARE.
 
 #include "ArgVector.hpp"
-#include <utility>
 
 namespace rshell {
 
 ArgVector::ArgVector(std::string program, std::vector<std::string> arguments)
-    : _program{std::move(program)}
-    , _arguments{std::move(arguments)}
+    : _program(program)
+    , _arguments(arguments)
 {
     update();
 }
@@ -29,20 +28,21 @@ ArgVector::ArgVector(std::string program, std::vector<std::string> arguments)
 void ArgVector::update(std::string program,
         std::vector<std::string> arguments)
 {
-    _program = std::move(program);
-    _arguments = std::move(arguments);
+    _program = program;
+    _arguments = arguments;
     update();
 }
 
 void ArgVector::update()
 {
     _argv.clear();
-    _argv.push_back(&_program.front());
-    for (auto&& arg : _arguments) {
-        _argv.push_back(&arg.front());
+    _argv.push_back(&_program[0]);
+    for (std::vector<std::string>::iterator arg = _arguments.begin();
+            arg != _arguments.end(); ++arg) {
+        _argv.push_back(&(*arg)[0]);
     }
 
-    _argv.push_back(nullptr);
+    _argv.push_back(0);
 }
 
 } // namespace rshell

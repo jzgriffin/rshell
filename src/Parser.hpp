@@ -22,7 +22,6 @@
 
 #include "Command.hpp"
 #include "Token.hpp"
-#include <memory>
 
 namespace rshell {
 
@@ -41,7 +40,9 @@ public:
     ///
     /// The parsing process is considered a failure if the token sequence is
     /// not well-formed.
-    std::unique_ptr<Command> apply();
+    ///
+    /// The returned pointer is owned by the caller.
+    Command* apply();
 
 private:
     const std::vector<Token>& _tokens; //!< Sequence of tokens to parse

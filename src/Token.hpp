@@ -24,20 +24,20 @@
 
 namespace rshell {
 
+/// \brief Types of tokens that may appear in a command string
+enum TokenType
+{
+    TokenNone, //!< Represents the end of a token sequence
+    TokenWord, //!< Space-delimited word or quoted grouping of words
+    TokenSequence, //!< Sequential command delimiter
+    TokenConjunction, //!< Conjunctive command delimiter
+    TokenDisjunction //!< Disjunctive command delimiter
+};
+
 /// \brief Represents a lexical token within a command string
 struct Token
 {
-    /// \brief Types of tokens that may appear in a command string
-    enum class Type
-    {
-        None, //!< Represents the end of a token sequence
-        Word, //!< Space-delimited word or quoted grouping of words
-        Sequence, //!< Sequential command delimiter
-        Conjunction, //!< Conjunctive command delimiter
-        Disjunction, //!< Disjunctive command delimiter
-    };
-
-    Type type; //!< Type classification
+    TokenType type; //!< Type classification
     std::string text; //!< Body text
 };
 

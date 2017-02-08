@@ -24,7 +24,6 @@
 #include "Execution.hpp"
 #include "Token.hpp"
 #include <iosfwd>
-#include <memory>
 #include <string>
 #include <vector>
 
@@ -40,7 +39,7 @@ public:
 
     /// \brief Gets a value indicating whether or not the shell is interactive
     /// \return whether or not the shell is interactive
-    bool isInteractive() const noexcept { return _isInteractive; }
+    bool isInteractive() const { return _isInteractive; }
 
     /// \brief Sets whether or not the shell is interactive
     /// \param isInteractive whether or not the shell is interactive
@@ -48,7 +47,7 @@ public:
 
     /// \brief Gets a reference to the command input stream
     /// \return reference to the command input stream
-    std::istream& input() const noexcept { return *_input; }
+    std::istream& input() const { return *_input; }
 
     /// \brief Sets the command input stream
     /// \param input reference to the command input stream
@@ -57,12 +56,12 @@ public:
     /// \brief Gets a value indicating whether or not the shell is running
     /// \return whether or not the shell is running
     /// \see exitCode
-    bool isRunning() const noexcept { return _isRunning; }
+    bool isRunning() const { return _isRunning; }
 
     /// \brief Gets the exit code of the shell process
     /// \return exit code of the shell process
     /// \see isRunning
-    int exitCode() const noexcept { return _exitCode; }
+    int exitCode() const { return _exitCode; }
 
     /// \brief Processes a command
     ///
@@ -78,11 +77,11 @@ public:
     int run();
 
 private:
-    bool _isInteractive{true}; //!< Whether or not the shell is interactive
+    bool _isInteractive; //!< Whether or not the shell is interactive
     std::istream* _input; //!< Command input stream
 
-    bool _isRunning{false}; //!< Whether or not the shell is running
-    int _exitCode{0}; //!< Exit code of the shell process
+    bool _isRunning; //!< Whether or not the shell is running
+    int _exitCode; //!< Exit code of the shell process
 
     Execution _execution; //!< Execution strategy for executing commands
     std::string _commandPrompt; //!< Text for the command prompt
@@ -115,7 +114,7 @@ private:
     /// \brief Prompts for, reads, tokenizes, and parses a command
     /// \return input command on success, \c null if the input process failed
     /// \see promptCommand
-    std::unique_ptr<Command> getCommand() const;
+    Command* getCommand() const;
 
     /// \brief Executes the given command
     /// \param command command to execute

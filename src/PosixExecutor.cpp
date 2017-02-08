@@ -18,18 +18,21 @@
 #include "ArgVector.hpp"
 #include <cstdio>
 #include <cstdlib>
+#include <stdexcept>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
 
 namespace rshell {
 
-PosixExecutor::~PosixExecutor() = default;
+PosixExecutor::~PosixExecutor()
+{
+}
 
 int PosixExecutor::execute(const Command& command)
 {
     // Create an argv-style C array to pass to the system call
-    ArgVector argv{command.program, command.arguments};
+    ArgVector argv(command.program, command.arguments);
 
     // Fork the process.  If the fork is successful, there will be two
     // identical processes running at the same point on the next line of code.
@@ -37,7 +40,7 @@ int PosixExecutor::execute(const Command& command)
     // forked child process.  The other will possess a positive "pid" value,
     // indicating that it is the parent process and the pid is of the child.
     // If the "pid" value is negative, no fork occurred
-    auto pid = fork();
+    pid_t pid = fork();
     if (pid == 0) {
         // Invoke the exit system call, replacing the current process image
         // with the given executable
@@ -58,7 +61,7 @@ int PosixExecutor::execute(const Command& command)
         int status;
         if (waitpid(pid, &status, 0) < 0) {
             std::perror("rshell: wait failed");
-            throw std::runtime_error{"error while waiting"};
+            throw std::runtime_error("error while waiting");
         }
 
         // If the child process exited, as it should, return its exit code
@@ -67,11 +70,11 @@ int PosixExecutor::execute(const Command& command)
         }
 
         // If the child process did not exit, something went horribly wrong
-        throw std::runtime_error{"abnormal process termination"};
+        throw std::runtime_error("abnormal process termination");
     }
     else {
         std::perror("rshell: fork failed");
-        throw std::runtime_error{"unable to fork"};
+        throw std::runtime_error("unable to fork");
     }
 }
 

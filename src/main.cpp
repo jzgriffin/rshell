@@ -24,7 +24,7 @@ int main(int argc, char** argv)
     rshell::Shell shell;
 
     if (argc > 1) {
-        auto path = argv[1];
+        const char* path = argv[1];
         input.open(path);
         if (!input) {
             std::cerr << "rshell: error: unable to open " << path << '\n';

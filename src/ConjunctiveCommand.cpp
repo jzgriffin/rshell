@@ -18,10 +18,12 @@
 
 namespace rshell {
 
-ConjunctiveCommand::~ConjunctiveCommand() = default;
+ConjunctiveCommand::~ConjunctiveCommand()
+{
+}
 
 bool ConjunctiveCommand::shouldExecuteAfter(const Command& command,
-        int exitCode) const noexcept
+        int exitCode) const
 {
     return exitCode == 0;
 }

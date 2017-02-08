@@ -20,7 +20,6 @@
 #ifndef hpp_rshell_Command
 #define hpp_rshell_Command
 
-#include <memory>
 #include <string>
 #include <vector>
 
@@ -33,7 +32,7 @@ class Command
 public:
     std::string program; //!< Name of the program
     std::vector<std::string> arguments; //!< Arguments for the program
-    std::unique_ptr<Command> next; //!< Next command in the composition, if any
+    Command* next; //!< Next command in the composition, if any
 
     /// \brief Destructs the \ref Command instance
     virtual ~Command();
@@ -44,7 +43,7 @@ public:
     /// \param exitCode exit code of the preceding command
     /// \return whether or not the command should be executed after \p command
     virtual bool shouldExecuteAfter(const Command& command,
-            int exitCode) const noexcept = 0;
+            int exitCode) const = 0;
 };
 
 } // namespace rshell
