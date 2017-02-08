@@ -27,8 +27,8 @@ rshell.DEPEND := $(patsubst %.cpp,%.d,$(rshell.SOURCE))
 
 .PHONY: all clean distclean
 all: all-rshell
-clean: clean-rshell
-distclean: distclean-rshell
+clean: clean-rshell clean-doc
+distclean: distclean-rshell distclean-doc
 	$(RM) -r bin
 
 bin:
