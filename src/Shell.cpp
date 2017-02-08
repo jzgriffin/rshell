@@ -40,9 +40,20 @@ using utility::make_unique;
 namespace rshell {
 
 Shell::Shell()
-    : _execution{make_unique<PosixExecutor>()}
+    : _input{&std::cin}
+    , _execution{make_unique<PosixExecutor>()}
     , _commandPrompt{buildCommandPrompt()}
 {
+}
+
+void Shell::setInteractive(bool isInteractive)
+{
+    _isInteractive = isInteractive;
+}
+
+void Shell::setInput(std::istream& input)
+{
+    _input = &input;
 }
 
 void Shell::process()
@@ -57,7 +68,7 @@ int Shell::run()
 {
     _isRunning = true;
 
-    while (_isRunning) {
+    while (*_input && _isRunning) {
         process();
     }
 
@@ -96,12 +107,16 @@ std::string Shell::buildCommandPrompt() const
 
 void Shell::printCommandPrompt() const
 {
-    std::cout << _commandPrompt;
+    if (_isInteractive) {
+        std::cout << _commandPrompt;
+    }
 }
 
 void Shell::printContinuationPrompt() const
 {
-    std::cout << "> ";
+    if (_isInteractive) {
+        std::cout << "> ";
+    }
 }
 
 std::vector<Token> Shell::readCommand() const
@@ -117,7 +132,11 @@ std::vector<Token> Shell::readCommand() const
     std::string text;
     while (true) {
         std::string line;
-        std::getline(std::cin, line);
+        if (!std::getline(*_input, line)) {
+            // If the end of the input stream is reached, the shell will exit
+            return {};
+        }
+
         text += line;
 
         std::istringstream is{text};

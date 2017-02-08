@@ -23,6 +23,7 @@
 #include "Command.hpp"
 #include "Execution.hpp"
 #include "Token.hpp"
+#include <iosfwd>
 #include <memory>
 #include <string>
 #include <vector>
@@ -36,6 +37,22 @@ class Shell
 public:
     /// \brief Constructs a new instance of the \ref Shell class
     Shell();
+
+    /// \brief Gets a value indicating whether or not the shell is interactive
+    /// \return whether or not the shell is interactive
+    bool isInteractive() const noexcept { return _isInteractive; }
+
+    /// \brief Sets whether or not the shell is interactive
+    /// \param isInteractive whether or not the shell is interactive
+    void setInteractive(bool isInteractive);
+
+    /// \brief Gets a reference to the command input stream
+    /// \return reference to the command input stream
+    std::istream& input() const noexcept { return *_input; }
+
+    /// \brief Sets the command input stream
+    /// \param input reference to the command input stream
+    void setInput(std::istream& input);
 
     /// \brief Gets a value indicating whether or not the shell is running
     /// \return whether or not the shell is running
@@ -61,8 +78,12 @@ public:
     int run();
 
 private:
+    bool _isInteractive{true}; //!< Whether or not the shell is interactive
+    std::istream* _input; //!< Command input stream
+
     bool _isRunning{false}; //!< Whether or not the shell is running
     int _exitCode{0}; //!< Exit code of the shell process
+
     Execution _execution; //!< Execution strategy for executing commands
     std::string _commandPrompt; //!< Text for the command prompt
 

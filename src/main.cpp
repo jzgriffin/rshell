@@ -15,11 +15,25 @@
 // SOFTWARE.
 
 #include "Shell.hpp"
+#include <fstream>
+#include <iostream>
 
 int main(int argc, char** argv)
 {
-    // The entirety of the application logic is encapsulated in the Shell
-    // class.  Thus the only purpose of the main function is to instantiate a
-    // Shell and call its run method
-    return rshell::Shell{}.run();
+    std::ifstream input;
+    rshell::Shell shell;
+
+    if (argc > 1) {
+        auto path = argv[1];
+        input.open(path);
+        if (!input) {
+            std::cerr << "rshell: error: unable to open " << path << '\n';
+            return 1;
+        }
+
+        shell.setInteractive(false);
+        shell.setInput(input);
+    }
+
+    return shell.run();
 }
