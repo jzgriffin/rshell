@@ -58,9 +58,14 @@ void Shell::setInput(std::istream& input)
 
 void Shell::process()
 {
-    auto command = getCommand();
-    if (command != nullptr) {
-        execute(*command);
+    try {
+        auto command = getCommand();
+        if (command != nullptr) {
+            execute(*command);
+        }
+    }
+    catch (const std::exception& e) {
+        std::cerr << "rshell: error: " << e.what() << '\n';
     }
 }
 
