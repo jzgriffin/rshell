@@ -14,6 +14,7 @@ rshell.SOURCE := \
     src/ConjunctiveCommand.cpp \
     src/DisjunctiveCommand.cpp \
     src/ExitBuiltinCommand.cpp \
+    src/TestBuiltinCommand.cpp \
     src/Tokenizer.cpp \
     src/Parser.cpp \
     src/Executor.cpp \

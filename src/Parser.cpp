@@ -20,6 +20,7 @@
 #include "ExecutableCommand.hpp"
 #include "ExitBuiltinCommand.hpp"
 #include "SequentialCommand.hpp"
+#include "TestBuiltinCommand.hpp"
 #include "utility/make_unique.hpp"
 #include <cassert>
 #include <stdexcept>
@@ -63,6 +64,9 @@ void Parser::parseWord(const Token& token)
     if (*_current == nullptr) {
         if (token.text == "exit") {
             *_current = make_unique<ExitBuiltinCommand>();
+        }
+        else if (token.text == "test" || token.text == "[") {
+            *_current = make_unique<TestBuiltinCommand>();
         }
         else {
             *_current = make_unique<ExecutableCommand>();
