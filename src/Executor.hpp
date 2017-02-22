@@ -20,7 +20,7 @@
 #ifndef hpp_rshell_Executor
 #define hpp_rshell_Executor
 
-#include "Command.hpp"
+#include "ExecutableCommand.hpp"
 
 namespace rshell {
 
@@ -32,10 +32,15 @@ public:
     /// \brief Destructs the \ref Executor instance
     virtual ~Executor();
 
+    /// \brief Executes the abstract command given
+    /// \param command command to execute
+    /// \return exit code of the command
+    virtual int execute(Command& command);
+
     /// \brief Executes the individual command given
     /// \param command command to execute
     /// \return exit code of the command
-    virtual int execute(const Command& command) = 0;
+    virtual int execute(ExecutableCommand& command) = 0;
 };
 
 } // namespace rshell

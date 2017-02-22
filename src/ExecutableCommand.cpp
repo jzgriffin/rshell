@@ -14,16 +14,16 @@
 // ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS
 // SOFTWARE.
 
-#include "InitialCommand.hpp"
+#include "ExecutableCommand.hpp"
+#include "Executor.hpp"
 
 namespace rshell {
 
-InitialCommand::~InitialCommand() = default;
+ExecutableCommand::~ExecutableCommand() = default;
 
-bool InitialCommand::shouldExecuteAfter(const Command& command,
-        int exitCode) const noexcept
+int ExecutableCommand::execute(Executor& executor)
 {
-    return false;
+    return executor.execute(*this);
 }
 
 } // namespace rshell

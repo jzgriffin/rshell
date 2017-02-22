@@ -14,61 +14,25 @@
 // ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS
 // SOFTWARE.
 
-#include "Execution.hpp"
+#include "ExitBuiltinCommand.hpp"
+#include "Executor.hpp"
 #include "ExitException.hpp"
 #include <iostream>
-#include <stdexcept>
-#include <utility>
+#include <string>
 
 namespace rshell {
 
-Execution::Execution(std::unique_ptr<Executor>&& executor)
-    : _executor{std::move(executor)}
-{
-    if (_executor == nullptr) {
-        throw std::runtime_error{"null executor in Execution"};
-    }
-}
+ExitBuiltinCommand::~ExitBuiltinCommand() = default;
 
-int Execution::execute(const Command& command)
-{
-    int exitCode = 0;
-    const Command* previous = nullptr;
-
-    // Loop over the command composition, starting with the first
-    for (auto current = &command; current != nullptr;
-            current = current->next.get()) {
-        // If there was a previously executed command (ie, this is not
-        // the first), do not execute if the command itself indicates
-        // that it should not follow the previous command
-        if (previous != nullptr
-                && !current->shouldExecuteAfter(*previous, exitCode)) {
-            continue;
-        }
-
-        // The "exit" command is a special case--handle it separately
-        if (current->program == "exit") {
-            handleExit(*current); // Does not return; throws
-        }
-
-        // Store the exit code of the command and make it the previosuly
-        // executed command
-        exitCode = _executor->execute(*current);
-        previous = current;
-    }
-
-    return exitCode;
-}
-
-void Execution::handleExit(const Command& command)
+int ExitBuiltinCommand::execute(Executor& executor)
 {
     int exitCode = 0;
 
     // The exit command accepts an optional argument that sets the exit
     // code of the shell
-    if (!command.arguments.empty()) {
+    if (!arguments.empty()) {
         try {
-            exitCode = std::stoi(command.arguments.front());
+            exitCode = std::stoi(arguments.front());
         }
         catch (...) {
             // std::stoi throws when conversion is impossible; we do not

@@ -15,15 +15,25 @@
 // SOFTWARE.
 
 #include "ConjunctiveCommand.hpp"
+#include "Executor.hpp"
+#include <stdexcept>
 
 namespace rshell {
 
 ConjunctiveCommand::~ConjunctiveCommand() = default;
 
-bool ConjunctiveCommand::shouldExecuteAfter(const Command& command,
-        int exitCode) const noexcept
+int ConjunctiveCommand::execute(Executor& executor)
 {
-    return exitCode == 0;
+    if (primary == nullptr || secondary == nullptr) {
+        throw std::runtime_error{"incomplete ConjunctiveCommand"};
+    }
+
+    auto exitCode = primary->execute(executor);
+    if (exitCode == 0) {
+        exitCode = secondary->execute(executor);
+    }
+
+    return exitCode;
 }
 
 } // namespace rshell

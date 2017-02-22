@@ -15,34 +15,32 @@
 // SOFTWARE.
 
 /// \file
-/// \brief Contains the interface to the \ref rshell::InitialCommand class
+/// \brief Contains the interface to the \ref rshell::ExitBuiltinCommand class
 
-#ifndef hpp_rshell_InitialCommand
-#define hpp_rshell_InitialCommand
+#ifndef hpp_rshell_ExitBuiltinCommand
+#define hpp_rshell_ExitBuiltinCommand
 
-#include "Command.hpp"
+#include "ExecutableCommand.hpp"
 
 namespace rshell {
 
-/// \brief First command within a command composition
-class InitialCommand : public Command
+/// \brief Represents an invocation of the exit builtin command
+///
+/// The exit command accepts one optional argument: the integral exit code
+/// to exit the shell with.  If this argument is omitted, the exit code
+/// will be zero.
+class ExitBuiltinCommand : public ExecutableCommand
 {
 public:
-    /// \brief Destructs the \ref InitialCommand instance
-    virtual ~InitialCommand();
+    /// \brief Destructs the \ref ExitBuiltinCommand instance
+    virtual ~ExitBuiltinCommand();
 
-    /// \brief Determines whether the command should be executed after the
-    /// given command in a composition
-    /// \param command preceding command
-    /// \param exitCode exit code of the preceding command
-    /// \return \c false
-    ///
-    /// Always returns false, as an initial command should never come after
-    /// another command.
-    virtual bool shouldExecuteAfter(const Command& command,
-            int exitCode) const noexcept override;
+    /// \brief Executes the command using the given executor
+    /// \param executor executor to use for execution
+    /// \return exit code of the command
+    virtual int execute(Executor& executor) override;
 };
 
 } // namespace rshell
 
-#endif // hpp_rshell_InitialCommand
+#endif // hpp_rshell_ExitBuiltinCommand

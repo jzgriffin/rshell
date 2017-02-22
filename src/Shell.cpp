@@ -41,7 +41,7 @@ namespace rshell {
 
 Shell::Shell()
     : _input{&std::cin}
-    , _execution{make_unique<PosixExecutor>()}
+    , _executor{make_unique<PosixExecutor>()}
     , _commandPrompt{buildCommandPrompt()}
 {
 }
@@ -176,10 +176,10 @@ std::unique_ptr<Command> Shell::getCommand() const
     return Parser{tokens}.apply();
 }
 
-int Shell::execute(const Command& command)
+int Shell::execute(Command& command)
 {
     try {
-        return _execution.execute(command);
+        return command.execute(*_executor);
     }
     catch (const ExitException& e) {
         // The exit command throws an integer when it is executed.  We

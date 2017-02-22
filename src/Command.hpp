@@ -20,31 +20,23 @@
 #ifndef hpp_rshell_Command
 #define hpp_rshell_Command
 
-#include <memory>
-#include <string>
-#include <vector>
-
 namespace rshell {
+
+// Forward declarations
+class Executor;
 
 /// \brief Serves as the abstract base class in the composite pattern of the
 /// command structure
 class Command
 {
 public:
-    std::string program; //!< Name of the program
-    std::vector<std::string> arguments; //!< Arguments for the program
-    std::unique_ptr<Command> next; //!< Next command in the composition, if any
-
     /// \brief Destructs the \ref Command instance
     virtual ~Command();
 
-    /// \brief Determines whether the command should be executed after the
-    /// given command in a composition
-    /// \param command preceding command
-    /// \param exitCode exit code of the preceding command
-    /// \return whether or not the command should be executed after \p command
-    virtual bool shouldExecuteAfter(const Command& command,
-            int exitCode) const noexcept = 0;
+    /// \brief Executes the command using the given executor
+    /// \param executor executor to use for execution
+    /// \return exit code of the command
+    virtual int execute(Executor& executor) = 0;
 };
 
 } // namespace rshell

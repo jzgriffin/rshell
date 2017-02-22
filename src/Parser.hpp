@@ -23,8 +23,12 @@
 #include "Command.hpp"
 #include "Token.hpp"
 #include <memory>
+#include <vector>
 
 namespace rshell {
+
+// Forward declarations
+class SequentialCommand;
 
 /// \brief Accepts a sequence of tokens and transforms it into a composition
 /// of one or more commands
@@ -45,6 +49,15 @@ public:
 
 private:
     const std::vector<Token>& _tokens; //!< Sequence of tokens to parse
+
+    std::unique_ptr<Command> _root;
+    std::unique_ptr<Command>* _current;
+    SequentialCommand* _scope;
+
+    void parseWord(const Token& token);
+    void parseSequence(const Token& token);
+    void parseConjunction(const Token& token);
+    void parseDisjunction(const Token& token);
 };
 
 } // namespace rshell

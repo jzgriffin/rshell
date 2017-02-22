@@ -15,15 +15,25 @@
 // SOFTWARE.
 
 #include "SequentialCommand.hpp"
+#include "Executor.hpp"
+#include <stdexcept>
 
 namespace rshell {
 
 SequentialCommand::~SequentialCommand() = default;
 
-bool SequentialCommand::shouldExecuteAfter(const Command& command,
-        int exitCode) const noexcept
+int SequentialCommand::execute(Executor& executor)
 {
-    return true;
+    if (sequence.empty()) {
+        throw std::runtime_error{"incomplete SequentialCommand"};
+    }
+
+    auto exitCode = 0;
+    for (auto&& command : sequence) {
+        exitCode = command->execute(executor);
+    }
+
+    return exitCode;
 }
 
 } // namespace rshell

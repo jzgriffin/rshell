@@ -18,6 +18,7 @@
 #include "ArgVector.hpp"
 #include <cstdio>
 #include <cstdlib>
+#include <stdexcept>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
@@ -26,7 +27,7 @@ namespace rshell {
 
 PosixExecutor::~PosixExecutor() = default;
 
-int PosixExecutor::execute(const Command& command)
+int PosixExecutor::execute(ExecutableCommand& command)
 {
     // Create an argv-style C array to pass to the system call
     ArgVector argv{command.program, command.arguments};

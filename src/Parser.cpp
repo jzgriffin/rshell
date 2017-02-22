@@ -17,10 +17,14 @@
 #include "Parser.hpp"
 #include "ConjunctiveCommand.hpp"
 #include "DisjunctiveCommand.hpp"
-#include "InitialCommand.hpp"
+#include "ExecutableCommand.hpp"
+#include "ExitBuiltinCommand.hpp"
 #include "SequentialCommand.hpp"
 #include "utility/make_unique.hpp"
+#include <cassert>
 #include <stdexcept>
+
+#include <iostream>
 
 using utility::make_unique;
 
@@ -33,50 +37,95 @@ Parser::Parser(const std::vector<Token>& tokens)
 
 std::unique_ptr<Command> Parser::apply()
 {
-    std::unique_ptr<Command> initial;
-    Command* current = nullptr;
+    _root.release();
+    _current = &_root;
+    _scope = nullptr;
+
     for (auto&& token : _tokens) {
-        // If the initial command has not yet been created, it must be
-        // instantiated and made current
-        if (initial == nullptr) {
-            initial = make_unique<InitialCommand>();
-            current = initial.get();
-        }
-
-        // If the current command does not yet have a program name, the
-        // current token must be the name.  Otherwise, if the current token is
-        // a word, it must be the next argument to the current command.
-        // Otherwise, a new command should be instantiated and made current
-        // according to the type of connective represented by the current
-        // token
-        if (current->program.empty()) {
-            if (token.type != Token::Type::Word) {
-                throw std::runtime_error{"command must start with word"};
-            }
-
-            current->program = token.text;
-        }
-        else if (token.type == Token::Type::Word) {
-            current->arguments.push_back(token.text);
-        }
-        else if (token.type == Token::Type::Sequence) {
-            current->next = make_unique<SequentialCommand>();
-            current = current->next.get();
-        }
-        else if (token.type == Token::Type::Conjunction) {
-            current->next = make_unique<ConjunctiveCommand>();
-            current = current->next.get();
-        }
-        else if (token.type == Token::Type::Disjunction) {
-            current->next = make_unique<DisjunctiveCommand>();
-            current = current->next.get();
-        }
-        else {
-            throw std::runtime_error{"unexpected token"};
+        switch (token.type) {
+            case Token::Type::Word: parseWord(token); break;
+            case Token::Type::Sequence: parseSequence(token); break;
+            case Token::Type::Conjunction: parseConjunction(token); break;
+            case Token::Type::Disjunction: parseDisjunction(token); break;
+            case Token::Type::None: break;
         }
     }
 
-    return initial;
+    return std::move(_root);
+}
+
+void Parser::parseWord(const Token& token)
+{
+    assert(token.type == Token::Type::Word);
+
+    if (*_current == nullptr) {
+        if (token.text == "exit") {
+            *_current = make_unique<ExitBuiltinCommand>();
+        }
+        else {
+            *_current = make_unique<ExecutableCommand>();
+        }
+    }
+
+    auto executable = dynamic_cast<ExecutableCommand*>(_current->get());
+    if (executable == nullptr) {
+        throw std::runtime_error{"word in non-executable command"};
+    }
+
+    if (executable->program.empty()) {
+        executable->program = token.text;
+    }
+    else {
+        executable->arguments.push_back(token.text);
+    }
+}
+
+void Parser::parseSequence(const Token& token)
+{
+    assert(token.type == Token::Type::Sequence);
+
+    if (_scope == nullptr) {
+        auto scope = make_unique<SequentialCommand>();
+        if (_root != nullptr) {
+            scope->sequence.push_back(std::move(_root));
+        }
+
+        _scope = scope.get();
+        _root = std::move(scope);
+    }
+
+    _scope->sequence.push_back(nullptr);
+    _current = &_scope->sequence.back();
+}
+
+void Parser::parseConjunction(const Token& token)
+{
+    assert(token.type == Token::Type::Conjunction);
+
+    if (*_current == nullptr) {
+        throw std::runtime_error{"conjunction must follow command"};
+    }
+
+    auto current = make_unique<ConjunctiveCommand>();
+    auto connective = current.get();
+    current->primary = std::move(*_current);
+    *_current = std::move(current);
+    _current = &connective->secondary;
+}
+
+void Parser::parseDisjunction(const Token& token)
+{
+    assert(token.type == Token::Type::Disjunction);
+
+    if (*_current == nullptr) {
+        throw std::runtime_error{"disjunction must follow command"};
+    }
+
+    auto current = make_unique<DisjunctiveCommand>();
+    auto connective = current.get();
+    current->primary = std::move(*_current);
+    *_current = std::move(current);
+    _current = &connective->secondary;
 }
 
 } // namespace rshell

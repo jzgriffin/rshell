@@ -21,6 +21,8 @@
 #define hpp_rshell_SequentialCommand
 
 #include "Command.hpp"
+#include <memory>
+#include <vector>
 
 namespace rshell {
 
@@ -28,18 +30,16 @@ namespace rshell {
 class SequentialCommand : public Command
 {
 public:
+    /// \brief Sequence of commands to execute
+    std::vector<std::unique_ptr<Command>> sequence;
+
     /// \brief Destructs the \ref SequentialCommand instance
     virtual ~SequentialCommand();
 
-    /// \brief Determines whether the command should be executed after the
-    /// given command in a composition
-    /// \param command preceding command
-    /// \param exitCode exit code of the preceding command
-    /// \return \c true
-    ///
-    /// Always returns true, as a sequential command is always executed.
-    virtual bool shouldExecuteAfter(const Command& command,
-            int exitCode) const noexcept override;
+    /// \brief Executes the command using the given executor
+    /// \param executor executor to use for execution
+    /// \return exit code of the command
+    virtual int execute(Executor& executor) override;
 };
 
 } // namespace rshell

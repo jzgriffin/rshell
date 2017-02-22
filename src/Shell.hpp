@@ -21,7 +21,7 @@
 #define hpp_rshell_Shell
 
 #include "Command.hpp"
-#include "Execution.hpp"
+#include "Executor.hpp"
 #include "Token.hpp"
 #include <iosfwd>
 #include <memory>
@@ -84,7 +84,7 @@ private:
     bool _isRunning{false}; //!< Whether or not the shell is running
     int _exitCode{0}; //!< Exit code of the shell process
 
-    Execution _execution; //!< Execution strategy for executing commands
+    std::unique_ptr<Executor> _executor; //!< Executor strategy for commands
     std::string _commandPrompt; //!< Text for the command prompt
 
     /// \brief Builds the command prompt text
@@ -123,7 +123,7 @@ private:
     ///
     /// Sets the \ref _isRunning member to \c false when an exit command is
     /// executed.
-    int execute(const Command& command);
+    int execute(Command& command);
 };
 
 } // namespace rshell

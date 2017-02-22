@@ -14,26 +14,34 @@
 // ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS
 // SOFTWARE.
 
-#include "DisjunctiveCommand.hpp"
-#include "Executor.hpp"
-#include <stdexcept>
+/// \file
+/// \brief Contains the interface to the \ref rshell::ExecutableCommand class
+
+#ifndef hpp_rshell_ExecutableCommand
+#define hpp_rshell_ExecutableCommand
+
+#include "Command.hpp"
+#include <string>
+#include <vector>
 
 namespace rshell {
 
-DisjunctiveCommand::~DisjunctiveCommand() = default;
-
-int DisjunctiveCommand::execute(Executor& executor)
+/// \brief Executable command for execution within a command composition
+class ExecutableCommand : public Command
 {
-    if (primary == nullptr || secondary == nullptr) {
-        throw std::runtime_error{"incomplete DisjunctiveCommand"};
-    }
+public:
+    std::string program; //!< Name of the program
+    std::vector<std::string> arguments; //!< Arguments for the program
 
-    auto exitCode = primary->execute(executor);
-    if (exitCode != 0) {
-        exitCode = secondary->execute(executor);
-    }
+    /// \brief Destructs the \ref ExecutableCommand instance
+    virtual ~ExecutableCommand();
 
-    return exitCode;
-}
+    /// \brief Executes the command using the given executor
+    /// \param executor executor to use for execution
+    /// \return exit code of the command
+    virtual int execute(Executor& executor) override;
+};
 
 } // namespace rshell
+
+#endif // hpp_rshell_ExecutableCommand

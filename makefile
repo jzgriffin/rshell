@@ -9,15 +9,15 @@ endif
 rshell.TARGET := bin/rshell
 rshell.SOURCE := \
     src/Command.cpp \
-    src/InitialCommand.cpp \
+    src/ExecutableCommand.cpp \
     src/SequentialCommand.cpp \
     src/ConjunctiveCommand.cpp \
     src/DisjunctiveCommand.cpp \
+    src/ExitBuiltinCommand.cpp \
     src/Tokenizer.cpp \
     src/Parser.cpp \
     src/Executor.cpp \
     src/PosixExecutor.cpp \
-    src/Execution.cpp \
     src/Shell.cpp \
     src/ExitException.cpp \
     src/ArgVector.cpp \

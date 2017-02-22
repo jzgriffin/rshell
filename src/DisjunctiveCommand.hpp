@@ -21,6 +21,7 @@
 #define hpp_rshell_DisjunctiveCommand
 
 #include "Command.hpp"
+#include <memory>
 
 namespace rshell {
 
@@ -29,16 +30,16 @@ namespace rshell {
 class DisjunctiveCommand : public Command
 {
 public:
+    std::unique_ptr<Command> primary; //!< Primary command to execute
+    std::unique_ptr<Command> secondary; //!< Secondary command to execute
+
     /// \brief Destructs the \ref DisjunctiveCommand instance
     virtual ~DisjunctiveCommand();
 
-    /// \brief Determines whether the command should be executed after the
-    /// given command in a composition
-    /// \param command preceding command
-    /// \param exitCode exit code of the preceding command
-    /// \return \c true if \p exitCode is nonzero
-    virtual bool shouldExecuteAfter(const Command& command,
-            int exitCode) const noexcept override;
+    /// \brief Executes the command using the given executor
+    /// \param executor executor to use for execution
+    /// \return exit code of the command
+    virtual int execute(Executor& executor) override;
 };
 
 } // namespace rshell

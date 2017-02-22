@@ -20,4 +20,9 @@ namespace rshell {
 
 Executor::~Executor() = default;
 
+int Executor::execute(Command& command)
+{
+    return command.execute(*this);
+}
+
 } // namespace rshell
