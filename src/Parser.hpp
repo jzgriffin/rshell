@@ -23,6 +23,8 @@
 #include "Command.hpp"
 #include "Token.hpp"
 #include <memory>
+#include <stack>
+#include <utility>
 #include <vector>
 
 namespace rshell {
@@ -48,16 +50,22 @@ public:
     std::unique_ptr<Command> apply();
 
 private:
+    using CommandPtr = std::unique_ptr<Command>;
+    using ScopePair = std::pair<SequentialCommand*, CommandPtr*>;
+
     const std::vector<Token>& _tokens; //!< Sequence of tokens to parse
 
-    std::unique_ptr<Command> _root;
-    std::unique_ptr<Command>* _current;
-    SequentialCommand* _scope;
+    CommandPtr _root;
+    CommandPtr* _current;
+    bool _isRootSequence{false};
+    std::stack<ScopePair> _scopes;
 
     void parseWord(const Token& token);
     void parseSequence(const Token& token);
     void parseConjunction(const Token& token);
     void parseDisjunction(const Token& token);
+    void parseOpenScope(const Token& token);
+    void parseCloseScope(const Token& token);
 };
 
 } // namespace rshell

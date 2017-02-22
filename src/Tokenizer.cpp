@@ -57,7 +57,7 @@ Tokenizer::Tokenizer(std::istream& input)
 
 bool Tokenizer::isValid() const noexcept
 {
-    return !(_inEscape || _inQuote);
+    return !(_inEscape || _inQuote || _inScope);
 }
 
 const std::vector<Token>& Tokenizer::apply()
@@ -95,6 +95,10 @@ Token Tokenizer::next()
     }
 
     if (nextDisjunction(token)) {
+        return token;
+    }
+
+    if (nextScope(token)) {
         return token;
     }
 
@@ -168,6 +172,20 @@ bool Tokenizer::nextDisjunction(Token& token)
     return true;
 }
 
+bool Tokenizer::nextScope(Token& token)
+{
+    // Scope tokens are left and right parentheses
+
+    switch (_input.peek()) {
+        case '(': token.type = Token::Type::OpenScope; break;
+        case ')': token.type = Token::Type::CloseScope; break;
+        default: return false;
+    }
+
+    token.text += _input.get();
+    return true;
+}
+
 bool Tokenizer::nextWord(Token& token)
 {
     // Word tokens consist of a mixture of one or more direct or quoted
@@ -201,7 +219,8 @@ bool Tokenizer::nextDirectWord(Token& token)
                 return false;
             }
 
-            if (c == '#' || c == ';' || c == '&' || c == '|') {
+            if (c == '#' || c == ';' || c == '&' || c == '|' ||
+                    c == '(' || c == ')') {
                 return false;
             }
         }

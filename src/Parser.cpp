@@ -39,7 +39,7 @@ std::unique_ptr<Command> Parser::apply()
 {
     _root.release();
     _current = &_root;
-    _scope = nullptr;
+    _scopes = {};
 
     for (auto&& token : _tokens) {
         switch (token.type) {
@@ -47,6 +47,8 @@ std::unique_ptr<Command> Parser::apply()
             case Token::Type::Sequence: parseSequence(token); break;
             case Token::Type::Conjunction: parseConjunction(token); break;
             case Token::Type::Disjunction: parseDisjunction(token); break;
+            case Token::Type::OpenScope: parseOpenScope(token); break;
+            case Token::Type::CloseScope: parseCloseScope(token); break;
             case Token::Type::None: break;
         }
     }
@@ -84,18 +86,23 @@ void Parser::parseSequence(const Token& token)
 {
     assert(token.type == Token::Type::Sequence);
 
-    if (_scope == nullptr) {
+    if (_scopes.empty()) {
         auto scope = make_unique<SequentialCommand>();
         if (_root != nullptr) {
             scope->sequence.push_back(std::move(_root));
         }
 
-        _scope = scope.get();
+        ScopePair pair;
+        pair.first = scope.get();
+        pair.second = _current;
+        _scopes.push(pair);
         _root = std::move(scope);
+        _isRootSequence = true;
     }
 
-    _scope->sequence.push_back(nullptr);
-    _current = &_scope->sequence.back();
+    auto scope = _scopes.top().first;
+    scope->sequence.push_back(nullptr);
+    _current = &scope->sequence.back();
 }
 
 void Parser::parseConjunction(const Token& token)
@@ -126,6 +133,42 @@ void Parser::parseDisjunction(const Token& token)
     current->primary = std::move(*_current);
     *_current = std::move(current);
     _current = &connective->secondary;
+}
+
+void Parser::parseOpenScope(const Token& token)
+{
+    assert(token.type == Token::Type::OpenScope);
+
+    if (*_current != nullptr) {
+        throw std::runtime_error{"scope must not follow command"};
+    }
+
+    auto scope = make_unique<SequentialCommand>();
+    scope->sequence.push_back(nullptr);
+
+    ScopePair pair;
+    pair.first = scope.get();
+    pair.second = _current;
+    _scopes.push(pair);
+
+    *_current = std::move(scope);
+    _current = &pair.first->sequence.back();
+}
+
+void Parser::parseCloseScope(const Token& token)
+{
+    assert(token.type == Token::Type::CloseScope);
+
+    if (*_current == nullptr) {
+        throw std::runtime_error{"scope close must follow command"};
+    }
+
+    if (_scopes.empty() || (_scopes.size() == 1 && _isRootSequence)) {
+        throw std::runtime_error{"cannot close scope outside of scope"};
+    }
+
+    _current = _scopes.top().second;
+    _scopes.pop();
 }
 
 } // namespace rshell

@@ -56,10 +56,18 @@ public:
     bool inQuote() const noexcept { return _inQuote; }
 
     /// \brief Gets a value indicating whether or not the tokenization
+    /// terminated during a scope sequence
+    /// \return whether or not the tokenization terminated during a scope
+    /// sequence
+    /// \see isValid
+    bool inScope() const noexcept { return _inScope; }
+
+    /// \brief Gets a value indicating whether or not the tokenization
     /// terminated normally
     /// \return whether or not the tokenization terminated normally
     /// \see inEscape
     /// \see inQuote
+    /// \see inScope
     bool isValid() const noexcept;
 
     /// \brief Repeatedly tokenizes the input stream until its end is reached
@@ -81,6 +89,10 @@ private:
     /// \brief Whether or not the tokenization terminated during a quote
     /// sequence
     bool _inQuote{false};
+
+    /// \brief Whether or not the tokenization terminated during a scope
+    /// sequence
+    bool _inScope{false};
 
     /// \brief Obtains the next token from the stream
     /// \return next token from the stream
@@ -108,6 +120,11 @@ private:
     /// \param token token to output into
     /// \return whether or not the tokenization succeeded
     bool nextDisjunction(Token& token);
+
+    /// \brief Tokenizes a scope character
+    /// \param token token to output into
+    /// \return whether or not the tokenization succeeded
+    bool nextScope(Token& token);
 
     /// \brief Tokenizes a command word
     /// \param token token to output into
