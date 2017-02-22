@@ -18,10 +18,25 @@
 #include "ArgVector.hpp"
 #include <cstdio>
 #include <cstdlib>
+#include <iostream>
 #include <stdexcept>
+#include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
+
+namespace {
+
+/// \brief Determines whether the given path is to an existing file
+/// \param path path to evaluate
+/// \return \c true of \p path is a file and exists
+bool isPathFile(const std::string& path)
+{
+    struct stat info;
+    return stat(path.c_str(), &info) == 0 && S_ISREG(info.st_mode);
+}
+
+}
 
 namespace rshell {
 
@@ -29,8 +44,16 @@ PosixExecutor::~PosixExecutor() = default;
 
 int PosixExecutor::execute(ExecutableCommand& command)
 {
+    // Attempt to locate the program to run.  If this process fails, bail out
+    // before forking because exec will fail.
+    auto program = searchPath(command.program);
+    if (!isPathFile(program)) {
+        std::cerr << "rshell: command not found: " << command.program << '\n';
+        return 1;
+    }
+
     // Create an argv-style C array to pass to the system call
-    ArgVector argv{command.program, command.arguments};
+    ArgVector argv{searchPath(command.program), command.arguments};
 
     // Fork the process.  If the fork is successful, there will be two
     // identical processes running at the same point on the next line of code.
@@ -42,7 +65,7 @@ int PosixExecutor::execute(ExecutableCommand& command)
     if (pid == 0) {
         // Invoke the exit system call, replacing the current process image
         // with the given executable
-        execvp(argv[0], argv);
+        execv(argv[0], argv);
 
         // Under normal conditions, exec does not return.  However, if an
         // error occurred, it will return, leaving us in the forked child
@@ -74,6 +97,59 @@ int PosixExecutor::execute(ExecutableCommand& command)
         std::perror("rshell: fork failed");
         throw std::runtime_error{"unable to fork"};
     }
+}
+
+std::vector<std::string> PosixExecutor::searchPaths() const
+{
+    static constexpr char delimiter = ':';
+
+    // Retrieve the value of PATH from the environment, then begin tokenizing
+    // it by its delimiting character.  Each element goes into the paths
+    // vector
+    std::vector<std::string> paths;
+    std::string var = getenv("PATH");
+    auto next = var.find(delimiter);
+    decltype(next) prev = 0;
+    while (next != std::string::npos) {
+        paths.push_back(var.substr(prev, next - prev));
+        prev = next + 1;
+        next = var.find(delimiter, prev);
+    }
+
+    // The above tokenization loop may stop with more data after the final
+    // delimiter; add the remainder to the paths vector
+    paths.push_back(var.substr(prev));
+
+    return paths;
+}
+
+std::string PosixExecutor::searchPath(const std::string& program) const
+{
+    static constexpr char delimiter = '/';
+
+    // If the program has a slash in it, we assume that it is complete and
+    // do not process it further
+    if (program.find(delimiter) != std::string::npos) {
+        return program;
+    }
+
+    // Try to locate the program in each path in succession
+    for (auto&& path : searchPaths()) {
+        // Ensure that the path item ends with a delimiter
+        auto attempt = path;
+        if (attempt.back() != delimiter) {
+            attempt.push_back(delimiter);
+        }
+
+        attempt += program;
+
+        // If the program exists as a file, stop early
+        if (isPathFile(attempt)) {
+            return attempt;
+        }
+    }
+
+    return {};
 }
 
 } // namespace rshell
