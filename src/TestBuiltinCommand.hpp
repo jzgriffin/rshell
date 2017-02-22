@@ -37,6 +37,12 @@ public:
     /// \param executor executor to use for execution
     /// \return exit code of the command
     virtual int execute(Executor& executor) override;
+
+private:
+    /// \brief Reports the result of the test command
+    /// \param result result of the test
+    /// \return exit code for the command
+    int report(bool result);
 };
 
 } // namespace rshell

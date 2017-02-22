@@ -21,54 +21,99 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+namespace {
+
+/// \brief Modes of operation for the test command
+enum class TestMode
+{
+    DoesExist, //!< Does the given path exist?
+    IsFile, //!< Is the given path a file?
+    IsDirectory, //!< is the given path a directory?
+};
+
+}
+
 namespace rshell {
 
 TestBuiltinCommand::~TestBuiltinCommand() = default;
 
 int TestBuiltinCommand::execute(Executor& executor)
 {
+    // If we are using the symbolic form of the command, we expect the last
+    // argument to be a matching bracket.  The absence of this bracket is
+    // considered an error.  If the bracket is present, remove it so that we
+    // can use the same code as for the command form
+    auto args = arguments;
     if (program == "[") {
-        if (arguments.size() != 3 || arguments[2] != "]") {
-            std::cout << "Usage: [ -<e|f|d> <path> ]\n";
+        if (args.back() != "]") {
+            std::cerr << "rshell: [: must be terminated with ]\n";
+            return 1;
+        }
+
+        args.pop_back();
+    }
+
+    if (args.empty()) {
+        return report(false);
+    }
+
+    // Extract the test mode and path from the arguments.  If there is only
+    // one argument, assume that we are in an existential test mode.
+    // Otherwise, ensure that the mode is acceptable
+    TestMode mode;
+    std::string path;
+    if (args.size() == 1) {
+        mode = TestMode::DoesExist;
+        path = args[0];
+    }
+    else {
+        path = args[1];
+        if (args[0] == "-e") {
+            mode = TestMode::DoesExist;
+        }
+        else if (args[0] == "-f") {
+            mode = TestMode::IsFile;
+        }
+        else if (args[0] == "-d") {
+            mode = TestMode::IsDirectory;
+        }
+        else {
+            std::cerr << "test: " << args[0] << ": mode flag expected\n";
             return 1;
         }
     }
-    else if (arguments.size() != 2) {
-        std::cout << "Usage: test -<e|f|d> <path>\n";
-        return 1;
-    }
 
+    // Obtain the information about the file.  If stat fails, the entry does
+    // not exist
     struct stat info;
-    if (stat(arguments[1].c_str(), &info) != 0) {
-        std::cout << "(False)\n";
-        return 1;
+    auto doesExist = stat(path.c_str(), &info) == 0;
+
+    // Perform additional testing based on the mode
+    switch (mode) {
+        case TestMode::DoesExist:
+            return report(doesExist);
+
+        case TestMode::IsFile:
+            return report(doesExist && S_ISREG(info.st_mode));
+
+        case TestMode::IsDirectory:
+            return report(doesExist && S_ISDIR(info.st_mode));
     }
 
-    auto result = true;
-    if (arguments[0] == "-e") {
-    }
-    else if (arguments[0] == "-f") {
-        if (!S_ISREG(info.st_mode)) {
-            result = false;
-        }
-    }
-    else if (arguments[0] == "-d") {
-        if (!S_ISDIR(info.st_mode)) {
-            result = false;
-        }
-    }
-    else {
-        std::cerr << "test: flag must be one of -e|-f|-d\n";
-        return 1;
-    }
+    return report(false);
+}
 
-    if (result) {
-        std::cout << "(True)\n";
-        return 0;
-    }
+int TestBuiltinCommand::report(bool result)
+{
+    switch (result) {
+        case true:
+            std::cout << "(True)\n";
+            return true;
 
-    std::cout << "(False)\n";
-    return 1;
+        case false:
+            std::cout << "(False)\n";
+            return false;
+    }
 }
 
 } // namespace rshell
