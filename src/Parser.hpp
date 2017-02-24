@@ -50,21 +50,45 @@ public:
     std::unique_ptr<Command> apply();
 
 private:
+    /// \brief Type of smart pointer for storing Command instances
     using CommandPtr = std::unique_ptr<Command>;
+
+    /// \brief Type of pair used in the scope stack
+    ///
+    /// The first element is a pointer to the SequentialCommand representing
+    /// the scope.  The second element is a pointer to the owning pointer for
+    /// the SequentialCommand, which is used when popping the scope.
     using ScopePair = std::pair<SequentialCommand*, CommandPtr*>;
 
     const std::vector<Token>& _tokens; //!< Sequence of tokens to parse
 
-    CommandPtr _root;
-    CommandPtr* _current;
-    bool _isRootSequence{false};
-    std::stack<ScopePair> _scopes;
+    CommandPtr _root; //!< Root command for the parse
+    CommandPtr* _current; //!< Pointer to the current owning command pointer
+    bool _isRootSequence{false}; //!< Whether or not the root is sequential
+    std::stack<ScopePair> _scopes; //!< Stack of current scopes
 
+    /// \brief Parses a Token::Type::Word token
+    /// \param token token to parse
     void parseWord(const Token& token);
+
+    /// \brief Parses a Token::Type::Sequence token
+    /// \param token token to parse
     void parseSequence(const Token& token);
+
+    /// \brief Parses a Token::Type::Conjunction token
+    /// \param token token to parse
     void parseConjunction(const Token& token);
+
+    /// \brief Parses a Token::Type::Disjunction token
+    /// \param token token to parse
     void parseDisjunction(const Token& token);
+
+    /// \brief Parses a Token::Type::OpenScope token
+    /// \param token token to parse
     void parseOpenScope(const Token& token);
+
+    /// \brief Parses a Token::Type::CloseScope token
+    /// \param token token to parse
     void parseCloseScope(const Token& token);
 };
 
