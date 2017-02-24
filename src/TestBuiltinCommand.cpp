@@ -107,12 +107,12 @@ int TestBuiltinCommand::report(bool result)
 {
     switch (result) {
         case true:
-            std::cout << "(True)\n";
-            return true;
+            std::cout << "(True)" << std::endl;
+            return 0;
 
         case false:
-            std::cout << "(False)\n";
-            return false;
+            std::cout << "(False)" << std::endl;
+            return 1;
     }
 }
 
