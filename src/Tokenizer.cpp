@@ -57,7 +57,7 @@ Tokenizer::Tokenizer(std::istream& input)
 
 bool Tokenizer::isValid() const noexcept
 {
-    return !(_inEscape || _inQuote || _inScope);
+    return !(_inEscape || _inQuote || inScope());
 }
 
 const std::vector<Token>& Tokenizer::apply()
@@ -177,8 +177,8 @@ bool Tokenizer::nextScope(Token& token)
     // Scope tokens are left and right parentheses
 
     switch (_input.peek()) {
-        case '(': token.type = Token::Type::OpenScope; break;
-        case ')': token.type = Token::Type::CloseScope; break;
+        case '(': token.type = Token::Type::OpenScope; ++_scopeLevel; break;
+        case ')': token.type = Token::Type::CloseScope; --_scopeLevel; break;
         default: return false;
     }
 

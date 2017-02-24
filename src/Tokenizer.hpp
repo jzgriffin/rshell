@@ -60,7 +60,7 @@ public:
     /// \return whether or not the tokenization terminated during a scope
     /// sequence
     /// \see isValid
-    bool inScope() const noexcept { return _inScope; }
+    bool inScope() const noexcept { return _scopeLevel > 0; }
 
     /// \brief Gets a value indicating whether or not the tokenization
     /// terminated normally
@@ -90,9 +90,8 @@ private:
     /// sequence
     bool _inQuote{false};
 
-    /// \brief Whether or not the tokenization terminated during a scope
-    /// sequence
-    bool _inScope{false};
+    /// \brief Level of scope currently occupied
+    int _scopeLevel{0};
 
     /// \brief Obtains the next token from the stream
     /// \return next token from the stream
