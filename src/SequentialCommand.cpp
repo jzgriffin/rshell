@@ -30,7 +30,9 @@ int SequentialCommand::execute(Executor& executor)
 
     auto exitCode = 0;
     for (auto&& command : sequence) {
-        exitCode = command->execute(executor);
+        if (command != nullptr) {
+            exitCode = command->execute(executor);
+        }
     }
 
     return exitCode;
