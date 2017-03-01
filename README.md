@@ -19,6 +19,13 @@ the winter 2017 quarter.
   - Escape sequences
   - Line continuation
   - Comments
+- Scoped commands with precedence control via parentheses
+- `test` command
+  - Command form (`test ...`)
+  - Symbolic form (`[ ... ]`)
+  - Existential tests (`test -e ...`)
+  - Is-file tests (`test -f ...`)
+  - Is-directory tests (`test -d ...`)
 
 # Known Issues
 
