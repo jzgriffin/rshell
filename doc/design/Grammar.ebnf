@@ -1,0 +1,9 @@
+Command = SimpleCommand, [ ChainedCommand ] ;
+SimpleCommand = Word, { Word } ;
+ChainedCommand =
+    SequentialCommand |
+    ConjunctiveCommand |
+    DisjunctiveCommand ;
+SequentialCommand = Sequence, Command ;
+ConjunctiveCommand = Conjunction, Command ;
+DisjunctiveCommand = Disjunction, Command ;

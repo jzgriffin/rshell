@@ -1,0 +1,7 @@
+Comment = #.*
+Sequence = ;
+Conjunction = &&
+Disjunction = \|\|
+DirectWord = ([^\s"\\]|\\.)+
+QuotedWord = "([^"\\]|\\.)+"
+Word = (DirectWord|QuotedWord)+
