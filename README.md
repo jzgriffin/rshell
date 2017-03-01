@@ -45,6 +45,13 @@ documentation in the `doc/output/` directory.
 - GNU Make
 - Doxygen (optional; only for `doc` target)
 
+# Testing
+
+The source distribution contains an extensive test suite for the parser
+and built-in commands for the shell.  To execute the entire test suite,
+execute `make test`.  Alternatively, you may run individual suites with
+the shell scripts in the `tests` directory (e.g. `tests/exit.sh`).
+
 # Using
 
 Once built, the `rshell` executable resides in the `bin/` directory and
