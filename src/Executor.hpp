@@ -21,8 +21,15 @@
 #define hpp_rshell_Executor
 
 #include "ExecutableCommand.hpp"
+#include "ExecutorStreamSet.hpp"
+#include "WaitMode.hpp"
+#include <memory>
 
 namespace rshell {
+
+// Forward declarations
+class ExecutorPipe;
+class ExecutorStream;
 
 /// \brief Serves as the abstract base class in the strategy pattern of the
 /// execution algorithm
@@ -32,15 +39,47 @@ public:
     /// \brief Destructs the \ref Executor instance
     virtual ~Executor();
 
+    /// \brief Gets a reference to the set of open streams
+    /// \return reference to set of open streams
+    ExecutorStreamSet& streamSet() noexcept { return _streamSet; }
+
+    /// \brief Gets the stream to replace stdin
+    /// \return pointer to input stream
+    ExecutorStream* inputStream() const noexcept { return _inputStream; }
+
+    /// \brief Sets the stream to replace stdin
+    /// \param inputStream pointer to input stream
+    void setInputStream(ExecutorStream* inputStream);
+
+    /// \brief Gets the stream to replace stdout
+    /// \return pointer to output stream
+    ExecutorStream* outputStream() const noexcept { return _outputStream; }
+
+    /// \brief Sets the stream to replace stdout
+    /// \param outputStream pointer to output stream
+    void setOutputStream(ExecutorStream* outputStream);
+
+    /// \brief Creates a new pipe on the executor
+    /// \return pointer to new pipe
+    virtual std::unique_ptr<ExecutorPipe> createPipe() = 0;
+
     /// \brief Executes the abstract command given
     /// \param command command to execute
+    /// \param waitMode wait mode to use when executing
     /// \return exit code of the command
-    virtual int execute(Command& command);
+    virtual int execute(Command& command, WaitMode waitMode = WaitMode::Wait);
 
     /// \brief Executes the individual command given
     /// \param command command to execute
+    /// \param waitMode wait mode to use when executing
     /// \return exit code of the command
-    virtual int execute(ExecutableCommand& command) = 0;
+    virtual int execute(ExecutableCommand& command,
+            WaitMode waitMode = WaitMode::Wait) = 0;
+
+protected:
+    ExecutorStreamSet _streamSet; //!< Set of open streams to close
+    ExecutorStream* _inputStream{nullptr}; //!< Stream to replace stdin
+    ExecutorStream* _outputStream{nullptr}; //!< Stream to replace stdout
 };
 
 } // namespace rshell

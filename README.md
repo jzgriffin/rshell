@@ -26,11 +26,14 @@ the winter 2017 quarter.
   - Existential tests (`test -e ...`)
   - Is-file tests (`test -f ...`)
   - Is-directory tests (`test -d ...`)
+- Piped commands (including series of pipes)
 
 # Known Issues
 
 - Locked into initial working directory
 - Unable to get or set environment variables
+- Piping a scoped pipe into another command will cause a hang
+  Example: (echo abc | rev) | rev
 
 # Building
 

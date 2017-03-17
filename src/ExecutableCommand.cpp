@@ -21,9 +21,9 @@ namespace rshell {
 
 ExecutableCommand::~ExecutableCommand() = default;
 
-int ExecutableCommand::execute(Executor& executor)
+int ExecutableCommand::execute(Executor& executor, WaitMode waitMode)
 {
-    return executor.execute(*this);
+    return executor.execute(*this, waitMode);
 }
 
 } // namespace rshell

@@ -20,6 +20,8 @@
 #ifndef hpp_rshell_Command
 #define hpp_rshell_Command
 
+#include "WaitMode.hpp"
+
 namespace rshell {
 
 // Forward declarations
@@ -35,8 +37,9 @@ public:
 
     /// \brief Executes the command using the given executor
     /// \param executor executor to use for execution
+    /// \param waitMode wait mode to use when executing
     /// \return exit code of the command
-    virtual int execute(Executor& executor) = 0;
+    virtual int execute(Executor& executor, WaitMode waitMode) = 0;
 };
 
 } // namespace rshell

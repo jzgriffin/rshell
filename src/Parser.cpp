@@ -19,6 +19,7 @@
 #include "DisjunctiveCommand.hpp"
 #include "ExecutableCommand.hpp"
 #include "ExitBuiltinCommand.hpp"
+#include "PipeCommand.hpp"
 #include "SequentialCommand.hpp"
 #include "TestBuiltinCommand.hpp"
 #include "utility/make_unique.hpp"
@@ -50,6 +51,7 @@ std::unique_ptr<Command> Parser::apply()
             case Token::Type::Sequence: parseSequence(token); break;
             case Token::Type::Conjunction: parseConjunction(token); break;
             case Token::Type::Disjunction: parseDisjunction(token); break;
+            case Token::Type::Pipe: parsePipe(token); break;
             case Token::Type::OpenScope: parseOpenScope(token); break;
             case Token::Type::CloseScope: parseCloseScope(token); break;
             case Token::Type::None: break;
@@ -159,6 +161,25 @@ void Parser::parseDisjunction(const Token& token)
     // disjunctive command, and make the previous current command the primary
     // command of the disjunction
     auto current = make_unique<DisjunctiveCommand>();
+    auto connective = current.get();
+    current->primary = std::move(*_current);
+    *_current = std::move(current);
+    _current = &connective->secondary;
+}
+
+void Parser::parsePipe(const Token& token)
+{
+    assert(token.type == Token::Type::Pipe);
+
+    // "| foo" is an invalid command, as is "foo; | bar"
+    if (*_current == nullptr) {
+        throw std::runtime_error{"pipe must follow command"};
+    }
+
+    // Extract the current command from the tree, replace it with a pipe
+    // command, and make the previous current command the primary command
+    // of the pipe
+    auto current = make_unique<PipeCommand>();
     auto connective = current.get();
     current->primary = std::move(*_current);
     *_current = std::move(current);

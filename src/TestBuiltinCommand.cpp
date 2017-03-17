@@ -37,7 +37,7 @@ namespace rshell {
 
 TestBuiltinCommand::~TestBuiltinCommand() = default;
 
-int TestBuiltinCommand::execute(Executor& executor)
+int TestBuiltinCommand::execute(Executor& executor, WaitMode waitMode)
 {
     // If we are using the symbolic form of the command, we expect the last
     // argument to be a matching bracket.  The absence of this bracket is

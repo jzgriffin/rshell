@@ -14,26 +14,36 @@
 // ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS
 // SOFTWARE.
 
-#include "ConjunctiveCommand.hpp"
-#include "Executor.hpp"
-#include <stdexcept>
+#include "PosixExecutorPipeStream.hpp"
+#include "PosixExecutorPipe.hpp"
+#include <unistd.h>
 
 namespace rshell {
 
-ConjunctiveCommand::~ConjunctiveCommand() = default;
-
-int ConjunctiveCommand::execute(Executor& executor, WaitMode waitMode)
+PosixExecutorPipeStream::PosixExecutorPipeStream(PosixExecutorPipe& pipe,
+        int& file, Mode mode)
+    : ExecutorStream{mode}
+    , _pipe(pipe)
+    , _file(file)
 {
-    if (primary == nullptr || secondary == nullptr) {
-        throw std::runtime_error{"incomplete ConjunctiveCommand"};
+}
+
+PosixExecutorPipeStream::~PosixExecutorPipeStream() = default;
+
+void PosixExecutorPipeStream::activate(Executor& executor)
+{
+    int slot = 0;
+    switch (_mode) {
+        case Mode::Input: slot = STDIN_FILENO; break;
+        case Mode::Output: slot = STDOUT_FILENO; break;
     }
 
-    auto exitCode = primary->execute(executor, waitMode);
-    if (exitCode == 0) {
-        exitCode = secondary->execute(executor, waitMode);
-    }
+    ::dup2(_file, slot);
+}
 
-    return exitCode;
+void PosixExecutorPipeStream::close()
+{
+    ::close(_file);
 }
 
 } // namespace rshell

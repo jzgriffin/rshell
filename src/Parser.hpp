@@ -83,6 +83,10 @@ private:
     /// \param token token to parse
     void parseDisjunction(const Token& token);
 
+    /// \brief Parses a Token::Type::Pipe token
+    /// \param token token to parse
+    void parsePipe(const Token& token);
+
     /// \brief Parses a Token::Type::OpenScope token
     /// \param token token to parse
     void parseOpenScope(const Token& token);

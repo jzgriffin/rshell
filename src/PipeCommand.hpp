@@ -15,26 +15,26 @@
 // SOFTWARE.
 
 /// \file
-/// \brief Contains the interface to the \ref rshell::ConjunctiveCommand class
+/// \brief Contains the interface to the \ref rshell::PipeCommand class
 
-#ifndef hpp_rshell_ConjunctiveCommand
-#define hpp_rshell_ConjunctiveCommand
+#ifndef hpp_rshell_PipeCommand
+#define hpp_rshell_PipeCommand
 
 #include "Command.hpp"
 #include <memory>
 
 namespace rshell {
 
-/// \brief Command to be executed if the preceding command exited successfully
-/// with a zero exit code
-class ConjunctiveCommand : public Command
+/// \brief Command to be executed with a pipe joining the output of the
+/// primary command to the input of the secondary command
+class PipeCommand : public Command
 {
 public:
     std::unique_ptr<Command> primary; //!< Primary command to execute
     std::unique_ptr<Command> secondary; //!< Secondary command to execute
 
-    /// \brief Destructs the \ref ConjunctiveCommand instance
-    virtual ~ConjunctiveCommand();
+    /// \brief Destructs the \ref PipeCommand instance
+    virtual ~PipeCommand();
 
     /// \brief Executes the command using the given executor
     /// \param executor executor to use for execution
@@ -45,4 +45,4 @@ public:
 
 } // namespace rshell
 
-#endif // hpp_rshell_ConjunctiveCommand
+#endif // hpp_rshell_PipeCommand

@@ -22,15 +22,15 @@ namespace rshell {
 
 DisjunctiveCommand::~DisjunctiveCommand() = default;
 
-int DisjunctiveCommand::execute(Executor& executor)
+int DisjunctiveCommand::execute(Executor& executor, WaitMode waitMode)
 {
     if (primary == nullptr || secondary == nullptr) {
         throw std::runtime_error{"incomplete DisjunctiveCommand"};
     }
 
-    auto exitCode = primary->execute(executor);
+    auto exitCode = primary->execute(executor, waitMode);
     if (exitCode != 0) {
-        exitCode = secondary->execute(executor);
+        exitCode = secondary->execute(executor, waitMode);
     }
 
     return exitCode;

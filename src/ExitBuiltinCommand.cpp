@@ -24,7 +24,7 @@ namespace rshell {
 
 ExitBuiltinCommand::~ExitBuiltinCommand() = default;
 
-int ExitBuiltinCommand::execute(Executor& executor)
+int ExitBuiltinCommand::execute(Executor& executor, WaitMode waitMode)
 {
     int exitCode = 0;
 

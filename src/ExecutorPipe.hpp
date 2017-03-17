@@ -15,35 +15,32 @@
 // SOFTWARE.
 
 /// \file
-/// \brief Contains the interface to the \ref rshell::PosixExecutor class
+/// \brief Contains the interface to the \ref rshell::ExecutorPipe class
 
-#ifndef hpp_rshell_PosixExecutor
-#define hpp_rshell_PosixExecutor
+#ifndef hpp_rshell_ExecutorPipe
+#define hpp_rshell_ExecutorPipe
 
-#include "Executor.hpp"
+#include "ExecutorStream.hpp"
 
 namespace rshell {
 
-/// \brief Implementation of the execution algorithm on top of POSIX system
-/// calls
-class PosixExecutor : public Executor
+/// \brief Serves as the abstract base class in the strategy pattern of the
+/// piped execution algorithm
+class ExecutorPipe
 {
 public:
-    /// \brief Destructs the \ref PosixExecutor instance
-    virtual ~PosixExecutor();
+    /// \brief Destructs the \ref ExecutorPipe instance
+    virtual ~ExecutorPipe();
 
-    /// \brief Creates a new pipe on the executor
-    /// \return pointer to new pipe
-    virtual std::unique_ptr<ExecutorPipe> createPipe();
+    /// \brief Gets a reference to the read end of the stream
+    /// \return reference to input stream
+    virtual ExecutorStream& inputStream() = 0;
 
-    /// \brief Executes the individual command given
-    /// \param command command to execute
-    /// \param waitMode wait mode to use when executing
-    /// \return exit code of the command
-    virtual int execute(ExecutableCommand& command,
-            WaitMode waitMode = WaitMode::Wait) override;
+    /// \brief Gets a reference to the write end of the stream
+    /// \return reference to output stream
+    virtual ExecutorStream& outputStream() = 0;
 };
 
 } // namespace rshell
 
-#endif // hpp_rshell_PosixExecutor
+#endif // hpp_rshell_ExecutorPipe

@@ -184,7 +184,7 @@ std::unique_ptr<Command> Shell::getCommand() const
 int Shell::execute(Command& command)
 {
     try {
-        return command.execute(*_executor);
+        return _executor->execute(command);
     }
     catch (const ExitException& e) {
         // The exit command throws an integer when it is executed.  We

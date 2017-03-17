@@ -164,7 +164,11 @@ bool Tokenizer::nextDisjunction(Token& token)
 
     token.text += _input.get();
     if (_input.peek() != '|') {
-        throw std::runtime_error{"unexpected |"};
+        // If there is a single pipe character, the delimiter is a pipe, not
+        // a disjunction
+
+        token.type = Token::Type::Pipe;
+        return true;
     }
 
     token.text += _input.get();

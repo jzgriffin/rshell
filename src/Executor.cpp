@@ -20,9 +20,19 @@ namespace rshell {
 
 Executor::~Executor() = default;
 
-int Executor::execute(Command& command)
+void Executor::setInputStream(ExecutorStream* inputStream)
 {
-    return command.execute(*this);
+    _inputStream = inputStream;
+}
+
+void Executor::setOutputStream(ExecutorStream* outputStream)
+{
+    _outputStream = outputStream;
+}
+
+int Executor::execute(Command& command, WaitMode waitMode)
+{
+    return command.execute(*this, waitMode);
 }
 
 } // namespace rshell

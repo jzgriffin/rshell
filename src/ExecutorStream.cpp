@@ -14,26 +14,15 @@
 // ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS
 // SOFTWARE.
 
-#include "ConjunctiveCommand.hpp"
-#include "Executor.hpp"
-#include <stdexcept>
+#include "ExecutorStream.hpp"
 
 namespace rshell {
 
-ConjunctiveCommand::~ConjunctiveCommand() = default;
+ExecutorStream::~ExecutorStream() = default;
 
-int ConjunctiveCommand::execute(Executor& executor, WaitMode waitMode)
+ExecutorStream::ExecutorStream(Mode mode)
+    : _mode{mode}
 {
-    if (primary == nullptr || secondary == nullptr) {
-        throw std::runtime_error{"incomplete ConjunctiveCommand"};
-    }
-
-    auto exitCode = primary->execute(executor, waitMode);
-    if (exitCode == 0) {
-        exitCode = secondary->execute(executor, waitMode);
-    }
-
-    return exitCode;
 }
 
 } // namespace rshell

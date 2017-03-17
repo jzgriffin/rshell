@@ -22,7 +22,7 @@ namespace rshell {
 
 SequentialCommand::~SequentialCommand() = default;
 
-int SequentialCommand::execute(Executor& executor)
+int SequentialCommand::execute(Executor& executor, WaitMode waitMode)
 {
     if (sequence.empty()) {
         throw std::runtime_error{"incomplete SequentialCommand"};
@@ -31,7 +31,7 @@ int SequentialCommand::execute(Executor& executor)
     auto exitCode = 0;
     for (auto&& command : sequence) {
         if (command != nullptr) {
-            exitCode = command->execute(executor);
+            exitCode = command->execute(executor, waitMode);
         }
     }
 

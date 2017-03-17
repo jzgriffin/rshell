@@ -16,6 +16,9 @@
 
 #include "PosixExecutor.hpp"
 #include "ArgVector.hpp"
+#include "ExecutorStream.hpp"
+#include "PosixExecutorPipe.hpp"
+#include "utility/make_unique.hpp"
 #include <cstdio>
 #include <cstdlib>
 #include <stdexcept>
@@ -23,11 +26,18 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
+using utility::make_unique;
+
 namespace rshell {
 
 PosixExecutor::~PosixExecutor() = default;
 
-int PosixExecutor::execute(ExecutableCommand& command)
+std::unique_ptr<ExecutorPipe> PosixExecutor::createPipe()
+{
+    return make_unique<PosixExecutorPipe>();
+}
+
+int PosixExecutor::execute(ExecutableCommand& command, WaitMode waitMode)
 {
     // Create an argv-style C array to pass to the system call
     ArgVector argv{command.program, command.arguments};
@@ -40,6 +50,19 @@ int PosixExecutor::execute(ExecutableCommand& command)
     // If the "pid" value is negative, no fork occurred
     auto pid = fork();
     if (pid == 0) {
+        // Activate the input stream, if any
+        if (_inputStream != nullptr) {
+            _inputStream->activate(*this);
+        }
+
+        // Activate the output stream, if any
+        if (_outputStream != nullptr) {
+            _outputStream->activate(*this);
+        }
+
+        // Close all open streams to ensure proper termination
+        _streamSet.close();
+
         // Invoke the exit system call, replacing the current process image
         // with the given executable
         execvp(argv[0], argv);
@@ -53,6 +76,18 @@ int PosixExecutor::execute(ExecutableCommand& command)
         std::exit(1);
     }
     else if (pid > 0) {
+        // Skip waiting if we are meant to continue
+        switch (waitMode) {
+            case WaitMode::Continue:
+                return 0;
+
+            case WaitMode::Wait:
+                break;
+        }
+
+        // Close all open streams to ensure proper termination
+        _streamSet.close();
+
         // Wait for the forked child process to exit.  If the return value
         // of the waitpid system call is negative, an error occurred while
         // waiting

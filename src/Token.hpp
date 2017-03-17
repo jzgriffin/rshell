@@ -35,6 +35,7 @@ struct Token
         Sequence, //!< Sequential command delimiter
         Conjunction, //!< Conjunctive command delimiter
         Disjunction, //!< Disjunctive command delimiter
+        Pipe, //!< Piping command delimiter
         OpenScope, //!< Open scope character
         CloseScope, //!< Close scope character
     };

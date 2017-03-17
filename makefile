@@ -8,20 +8,26 @@ endif
 
 rshell.TARGET := bin/rshell
 rshell.SOURCE := \
+    src/ArgVector.cpp \
     src/Command.cpp \
-    src/ExecutableCommand.cpp \
-    src/SequentialCommand.cpp \
     src/ConjunctiveCommand.cpp \
     src/DisjunctiveCommand.cpp \
+    src/ExecutableCommand.cpp \
+    src/Executor.cpp \
+    src/ExecutorPipe.cpp \
+    src/ExecutorStream.cpp \
+    src/ExecutorStreamSet.cpp \
     src/ExitBuiltinCommand.cpp \
+    src/ExitException.cpp \
+    src/Parser.cpp \
+    src/PipeCommand.cpp \
+    src/PosixExecutor.cpp \
+    src/PosixExecutorPipe.cpp \
+    src/PosixExecutorPipeStream.cpp \
+    src/SequentialCommand.cpp \
+    src/Shell.cpp \
     src/TestBuiltinCommand.cpp \
     src/Tokenizer.cpp \
-    src/Parser.cpp \
-    src/Executor.cpp \
-    src/PosixExecutor.cpp \
-    src/Shell.cpp \
-    src/ExitException.cpp \
-    src/ArgVector.cpp \
     src/main.cpp
 rshell.OBJECT := $(patsubst %.cpp,%.o,$(rshell.SOURCE))
 rshell.DEPEND := $(patsubst %.cpp,%.d,$(rshell.SOURCE))

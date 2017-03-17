@@ -15,35 +15,20 @@
 // SOFTWARE.
 
 /// \file
-/// \brief Contains the interface to the \ref rshell::PosixExecutor class
+/// \brief Contains the interface to the \ref rshell::WaitMode enumeration
 
-#ifndef hpp_rshell_PosixExecutor
-#define hpp_rshell_PosixExecutor
-
-#include "Executor.hpp"
+#ifndef hpp_rshell_WaitMode
+#define hpp_rshell_WaitMode
 
 namespace rshell {
 
-/// \brief Implementation of the execution algorithm on top of POSIX system
-/// calls
-class PosixExecutor : public Executor
+/// \brief Modes of waiting for the execution of a command
+enum class WaitMode
 {
-public:
-    /// \brief Destructs the \ref PosixExecutor instance
-    virtual ~PosixExecutor();
-
-    /// \brief Creates a new pipe on the executor
-    /// \return pointer to new pipe
-    virtual std::unique_ptr<ExecutorPipe> createPipe();
-
-    /// \brief Executes the individual command given
-    /// \param command command to execute
-    /// \param waitMode wait mode to use when executing
-    /// \return exit code of the command
-    virtual int execute(ExecutableCommand& command,
-            WaitMode waitMode = WaitMode::Wait) override;
+    Wait, //!< Wait for the command to finish executing
+    Continue, //!< Do not wait for the command to finish executing
 };
 
 } // namespace rshell
 
-#endif // hpp_rshell_PosixExecutor
+#endif // hpp_rshell_WaitMode

@@ -38,8 +38,9 @@ public:
 
     /// \brief Executes the command using the given executor
     /// \param executor executor to use for execution
+    /// \param waitMode wait mode to use when executing
     /// \return exit code of the command
-    virtual int execute(Executor& executor) override;
+    virtual int execute(Executor& executor, WaitMode waitMode) override;
 };
 
 } // namespace rshell
