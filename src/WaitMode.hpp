@@ -15,7 +15,7 @@
 // SOFTWARE.
 
 /// \file
-/// \brief Contains the interface to the \ref rshell::WaitMode enumeration
+/// \brief Contains the interface to the rshell::WaitMode enumeration
 
 #ifndef hpp_rshell_WaitMode
 #define hpp_rshell_WaitMode

@@ -48,9 +48,9 @@ public:
     void close();
 
 protected:
-    int _files[2];
-    PosixExecutorPipeStream _inputStream;
-    PosixExecutorPipeStream _outputStream;
+    int _files[2]; //!< File descriptors for the pipe streams
+    PosixExecutorPipeStream _inputStream; //!< Stream for read end of pipe
+    PosixExecutorPipeStream _outputStream; //!< Stream for write end of pipe
 };
 
 } // namespace rshell
