@@ -26,6 +26,7 @@ run_test() {
     test_out="$($rshell $test_file 2>&1)"
     test_exit=$?
     popd > /dev/null
+    rm -f $suites_dir/$test_name*.tmp
 
     local success=1
     if [[ -f $out_file && "$test_out" != "$(cat $out_file)" ]]; then
