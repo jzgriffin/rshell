@@ -32,6 +32,8 @@ PosixExecutorPipeStream::~PosixExecutorPipeStream() = default;
 
 void PosixExecutorPipeStream::activate(Executor& executor)
 {
+    // In input mode, the stream replaces the standard input; in output mode,
+    // it replaces the standard output
     int slot = 0;
     switch (_mode) {
         case Mode::Input: slot = STDIN_FILENO; break;
