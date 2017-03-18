@@ -27,6 +27,7 @@ the winter 2017 quarter.
   - Is-file tests (`test -f ...`)
   - Is-directory tests (`test -d ...`)
 - Piped commands (including series of pipes)
+- Input/output redirection
 
 # Known Issues
 

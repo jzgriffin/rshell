@@ -15,18 +15,19 @@
 // SOFTWARE.
 
 #include "Parser.hpp"
+#include "AppendRedirectionCommand.hpp"
 #include "ConjunctiveCommand.hpp"
 #include "DisjunctiveCommand.hpp"
 #include "ExecutableCommand.hpp"
 #include "ExitBuiltinCommand.hpp"
+#include "InputRedirectionCommand.hpp"
+#include "OutputRedirectionCommand.hpp"
 #include "PipeCommand.hpp"
 #include "SequentialCommand.hpp"
 #include "TestBuiltinCommand.hpp"
 #include "utility/make_unique.hpp"
 #include <cassert>
 #include <stdexcept>
-
-#include <iostream>
 
 using utility::make_unique;
 
@@ -52,6 +53,9 @@ std::unique_ptr<Command> Parser::apply()
             case Token::Type::Conjunction: parseConjunction(token); break;
             case Token::Type::Disjunction: parseDisjunction(token); break;
             case Token::Type::Pipe: parsePipe(token); break;
+            case Token::Type::InputRedirection: parseInputRedirection(token); break;
+            case Token::Type::OutputRedirection: parseOutputRedirection(token); break;
+            case Token::Type::AppendRedirection: parseAppendRedirection(token); break;
             case Token::Type::OpenScope: parseOpenScope(token); break;
             case Token::Type::CloseScope: parseCloseScope(token); break;
             case Token::Type::None: break;
@@ -83,21 +87,94 @@ void Parser::parseWord(const Token& token)
         }
     }
 
-    // Ensure that the current command is executable.  If not, the word is in
-    // the wrong place
-    auto executable = dynamic_cast<ExecutableCommand*>(_current->get());
-    if (executable == nullptr) {
-        throw std::runtime_error{"word in non-executable command"};
+    auto didAccept =
+        parseExecutableWord(token)
+        || parseInputRedirectionWord(token)
+        || parseOutputRedirectionWord(token)
+        || parseAppendRedirectionWord(token);
+    if (!didAccept) {
+        throw std::runtime_error{"unexpected word encountered"};
+    }
+}
+
+bool Parser::parseExecutableWord(const Token& token)
+{
+    // Ensure the current command is an executable
+    auto command = dynamic_cast<ExecutableCommand*>(_current->get());
+    if (command == nullptr) {
+        return false;
     }
 
     // If there is no program in the command yet, take the word as the
     // program.  Otherwise, take it as another argument
-    if (executable->program.empty()) {
-        executable->program = token.text;
+    if (command->program.empty()) {
+        command->program = token.text;
     }
     else {
-        executable->arguments.push_back(token.text);
+        command->arguments.push_back(token.text);
     }
+
+    return true;
+}
+
+bool Parser::parseInputRedirectionWord(const Token& token)
+{
+    // Ensure the current command is an input redirection
+    auto command = dynamic_cast<InputRedirectionCommand*>(_current->get());
+    if (command == nullptr) {
+        return false;
+    }
+
+    // If there is no name in the path yet, take the word as the path
+    if (command->path.empty()) {
+        command->path = token.text;
+    }
+    else {
+        // "foo < bar baz" is invalid
+        throw std::runtime_error{"too many words after redirection"};
+    }
+
+    return true;
+}
+
+bool Parser::parseOutputRedirectionWord(const Token& token)
+{
+    // Ensure the current command is an output redirection
+    auto command = dynamic_cast<OutputRedirectionCommand*>(_current->get());
+    if (command == nullptr) {
+        return false;
+    }
+
+    // If there is no name in the path yet, take the word as the path
+    if (command->path.empty()) {
+        command->path = token.text;
+    }
+    else {
+        // "foo > bar baz" is invalid
+        throw std::runtime_error{"too many words after redirection"};
+    }
+
+    return true;
+}
+
+bool Parser::parseAppendRedirectionWord(const Token& token)
+{
+    // Ensure the current command is an append redirection
+    auto command = dynamic_cast<AppendRedirectionCommand*>(_current->get());
+    if (command == nullptr) {
+        return false;
+    }
+
+    // If there is no name in the path yet, take the word as the path
+    if (command->path.empty()) {
+        command->path = token.text;
+    }
+    else {
+        // "foo >> bar baz" is invalid
+        throw std::runtime_error{"too many words after redirection"};
+    }
+
+    return true;
 }
 
 void Parser::parseSequence(const Token& token)
@@ -184,6 +261,57 @@ void Parser::parsePipe(const Token& token)
     current->primary = std::move(*_current);
     *_current = std::move(current);
     _current = &connective->secondary;
+}
+
+void Parser::parseInputRedirection(const Token& token)
+{
+    assert(token.type == Token::Type::InputRedirection);
+
+    // "< foo" is an invalid command, as is "foo; < bar"
+    if (*_current == nullptr) {
+        throw std::runtime_error{"input redirection must follow command"};
+    }
+
+    // Extract the current command from the tree, replace it with an input
+    // redirection command, and make the previous current command the primary
+    // command of the redirection
+    auto current = make_unique<InputRedirectionCommand>();
+    current->primary = std::move(*_current);
+    *_current = std::move(current);
+}
+
+void Parser::parseOutputRedirection(const Token& token)
+{
+    assert(token.type == Token::Type::OutputRedirection);
+
+    // "> foo" is an invalid command, as is "foo; > bar"
+    if (*_current == nullptr) {
+        throw std::runtime_error{"output redirection must follow command"};
+    }
+
+    // Extract the current command from the tree, replace it with an output
+    // redirection command, and make the previous current command the primary
+    // command of the redirection
+    auto current = make_unique<OutputRedirectionCommand>();
+    current->primary = std::move(*_current);
+    *_current = std::move(current);
+}
+
+void Parser::parseAppendRedirection(const Token& token)
+{
+    assert(token.type == Token::Type::AppendRedirection);
+
+    // ">> foo" is an invalid command, as is "foo; >> bar"
+    if (*_current == nullptr) {
+        throw std::runtime_error{"append redirection must follow command"};
+    }
+
+    // Extract the current command from the tree, replace it with an output
+    // redirection command, and make the previous current command the primary
+    // command of the redirection
+    auto current = make_unique<AppendRedirectionCommand>();
+    current->primary = std::move(*_current);
+    *_current = std::move(current);
 }
 
 void Parser::parseOpenScope(const Token& token)

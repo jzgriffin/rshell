@@ -63,6 +63,24 @@ public:
     /// \return pointer to new pipe
     virtual std::unique_ptr<ExecutorPipe> createPipe() = 0;
 
+    /// \brief Creates a new input file stream on the executor
+    /// \param path path to open the stream on
+    /// \return pointer to new stream
+    virtual std::unique_ptr<ExecutorStream> createInputFileStream(
+            const std::string& path) = 0;
+
+    /// \brief Creates a new output file stream on the executor
+    /// \param path path to open the stream on
+    /// \return pointer to new stream
+    virtual std::unique_ptr<ExecutorStream> createOutputFileStream(
+            const std::string& path) = 0;
+
+    /// \brief Creates a new append file stream on the executor
+    /// \param path path to open the stream on
+    /// \return pointer to new stream
+    virtual std::unique_ptr<ExecutorStream> createAppendFileStream(
+            const std::string& path) = 0;
+
     /// \brief Executes the abstract command given
     /// \param command command to execute
     /// \param waitMode wait mode to use when executing

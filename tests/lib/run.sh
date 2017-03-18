@@ -22,8 +22,10 @@ run_test() {
     local out_file=$suites_dir/$test_name.out
     local exit_file=$suites_dir/$test_name.exit
 
+    pushd $(dirname $test_file) > /dev/null
     test_out="$($rshell $test_file 2>&1)"
     test_exit=$?
+    popd > /dev/null
 
     local success=1
     if [[ -f $out_file && "$test_out" != "$(cat $out_file)" ]]; then

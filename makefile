@@ -8,6 +8,7 @@ endif
 
 rshell.TARGET := bin/rshell
 rshell.SOURCE := \
+    src/AppendRedirectionCommand.cpp \
     src/ArgVector.cpp \
     src/Command.cpp \
     src/ConjunctiveCommand.cpp \
@@ -19,9 +20,14 @@ rshell.SOURCE := \
     src/ExecutorStreamSet.cpp \
     src/ExitBuiltinCommand.cpp \
     src/ExitException.cpp \
+    src/InputRedirectionCommand.cpp \
+    src/OutputRedirectionCommand.cpp \
     src/Parser.cpp \
     src/PipeCommand.cpp \
     src/PosixExecutor.cpp \
+    src/PosixExecutorAppendFileStream.cpp \
+    src/PosixExecutorInputFileStream.cpp \
+    src/PosixExecutorOutputFileStream.cpp \
     src/PosixExecutorPipe.cpp \
     src/PosixExecutorPipeStream.cpp \
     src/SequentialCommand.cpp \

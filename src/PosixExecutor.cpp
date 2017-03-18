@@ -17,6 +17,9 @@
 #include "PosixExecutor.hpp"
 #include "ArgVector.hpp"
 #include "ExecutorStream.hpp"
+#include "PosixExecutorAppendFileStream.hpp"
+#include "PosixExecutorInputFileStream.hpp"
+#include "PosixExecutorOutputFileStream.hpp"
 #include "PosixExecutorPipe.hpp"
 #include "utility/make_unique.hpp"
 #include <cstdio>
@@ -35,6 +38,24 @@ PosixExecutor::~PosixExecutor() = default;
 std::unique_ptr<ExecutorPipe> PosixExecutor::createPipe()
 {
     return make_unique<PosixExecutorPipe>();
+}
+
+std::unique_ptr<ExecutorStream> PosixExecutor::createInputFileStream(
+        const std::string& path)
+{
+    return make_unique<PosixExecutorInputFileStream>(path);
+}
+
+std::unique_ptr<ExecutorStream> PosixExecutor::createOutputFileStream(
+        const std::string& path)
+{
+    return make_unique<PosixExecutorOutputFileStream>(path);
+}
+
+std::unique_ptr<ExecutorStream> PosixExecutor::createAppendFileStream(
+        const std::string& path)
+{
+    return make_unique<PosixExecutorAppendFileStream>(path);
 }
 
 int PosixExecutor::execute(ExecutableCommand& command, WaitMode waitMode)

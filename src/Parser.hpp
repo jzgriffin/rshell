@@ -71,6 +71,26 @@ private:
     /// \param token token to parse
     void parseWord(const Token& token);
 
+    /// \brief Parses a Token::Type::Word token for an executable
+    /// \param token token to parse
+    /// \return whether the parse was accepted
+    bool parseExecutableWord(const Token& token);
+
+    /// \brief Parses a Token::Type::Word token for an input redirection
+    /// \param token token to parse
+    /// \return whether the parse was accepted
+    bool parseInputRedirectionWord(const Token& token);
+
+    /// \brief Parses a Token::Type::Word token for an output redirection
+    /// \param token token to parse
+    /// \return whether the parse was accepted
+    bool parseOutputRedirectionWord(const Token& token);
+
+    /// \brief Parses a Token::Type::Word token for an append redirection
+    /// \param token token to parse
+    /// \return whether the parse was accepted
+    bool parseAppendRedirectionWord(const Token& token);
+
     /// \brief Parses a Token::Type::Sequence token
     /// \param token token to parse
     void parseSequence(const Token& token);
@@ -86,6 +106,18 @@ private:
     /// \brief Parses a Token::Type::Pipe token
     /// \param token token to parse
     void parsePipe(const Token& token);
+
+    /// \brief Parses a Token::Type::InputRedirection token
+    /// \param token token to parse
+    void parseInputRedirection(const Token& token);
+
+    /// \brief Parses a Token::Type::OutputRedirection token
+    /// \param token token to parse
+    void parseOutputRedirection(const Token& token);
+
+    /// \brief Parses a Token::Type::AppendRedirection token
+    /// \param token token to parse
+    void parseAppendRedirection(const Token& token);
 
     /// \brief Parses a Token::Type::OpenScope token
     /// \param token token to parse

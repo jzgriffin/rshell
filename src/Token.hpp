@@ -36,6 +36,9 @@ struct Token
         Conjunction, //!< Conjunctive command delimiter
         Disjunction, //!< Disjunctive command delimiter
         Pipe, //!< Piping command delimiter
+        InputRedirection, //!< Input redirection delimiter
+        OutputRedirection, //!< Output redirection delimiter
+        AppendRedirection, //!< Append redirection delimiter
         OpenScope, //!< Open scope character
         CloseScope, //!< Close scope character
     };

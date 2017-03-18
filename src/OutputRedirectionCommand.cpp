@@ -14,39 +14,33 @@
 // ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS
 // SOFTWARE.
 
-#include "ExecutorStreamSet.hpp"
-#include "ExecutorPipe.hpp"
+#include "OutputRedirectionCommand.hpp"
+#include "Executor.hpp"
 #include "ExecutorStream.hpp"
+#include <stdexcept>
 
 namespace rshell {
 
-void ExecutorStreamSet::insert(ExecutorPipe& pipe)
-{
-    insert(pipe.inputStream());
-    insert(pipe.outputStream());
-}
+OutputRedirectionCommand::~OutputRedirectionCommand() = default;
 
-void ExecutorStreamSet::insert(ExecutorStream& stream)
+int OutputRedirectionCommand::execute(Executor& executor, WaitMode waitMode)
 {
-    _streams.insert(&stream);
-}
-
-void ExecutorStreamSet::erase(ExecutorPipe& pipe)
-{
-    erase(pipe.inputStream());
-    erase(pipe.outputStream());
-}
-
-void ExecutorStreamSet::erase(ExecutorStream& stream)
-{
-    _streams.erase(&stream);
-}
-
-void ExecutorStreamSet::close()
-{
-    for (auto&& stream : _streams) {
-        stream->close();
+    if (primary == nullptr || path.empty()) {
+        throw std::runtime_error{"incomplete OutputRedirectionCommand"};
     }
+
+    // Create the output file stream
+    auto stream = executor.createOutputFileStream(path);
+    executor.streamSet().insert(*stream.get());
+
+    // Make the stream the output stream for the executor and execute the
+    // command
+    executor.setOutputStream(stream.get());
+    auto exitCode = primary->execute(executor, waitMode);
+    executor.setOutputStream(nullptr);
+
+    executor.streamSet().erase(*stream.get());
+    return exitCode;
 }
 
 } // namespace rshell

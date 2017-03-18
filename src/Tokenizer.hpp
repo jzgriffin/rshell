@@ -120,6 +120,16 @@ private:
     /// \return whether or not the tokenization succeeded
     bool nextDisjunction(Token& token);
 
+    /// \brief Tokenizes an input redirection delimiter
+    /// \param token token to input to
+    /// \return whether or not the tokenization succeeded
+    bool nextInputRedirection(Token& token);
+
+    /// \brief Tokenizes an output redirection delimiter
+    /// \param token token to input to
+    /// \return whether or not the tokenization succeeded
+    bool nextOutputRedirection(Token& token);
+
     /// \brief Tokenizes a scope character
     /// \param token token to output into
     /// \return whether or not the tokenization succeeded

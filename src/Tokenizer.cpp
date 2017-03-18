@@ -98,6 +98,14 @@ Token Tokenizer::next()
         return token;
     }
 
+    if (nextInputRedirection(token)) {
+        return token;
+    }
+
+    if (nextOutputRedirection(token)) {
+        return token;
+    }
+
     if (nextScope(token)) {
         return token;
     }
@@ -176,6 +184,41 @@ bool Tokenizer::nextDisjunction(Token& token)
     return true;
 }
 
+bool Tokenizer::nextInputRedirection(Token& token)
+{
+    // Input redirection tokens consist of a single < symbol
+
+    if (_input.peek() != '<') {
+        return false;
+    }
+
+    token.text += _input.get();
+    token.type = Token::Type::InputRedirection;
+    return true;
+}
+
+bool Tokenizer::nextOutputRedirection(Token& token)
+{
+    // Output redirection tokens consist of two consecutive > symbols
+
+    if (_input.peek() != '>') {
+        return false;
+    }
+
+    token.text += _input.get();
+    if (_input.peek() != '>') {
+        // If there is a single arrow character, the delimiter is an output
+        // redirection, not an append redirection
+
+        token.type = Token::Type::OutputRedirection;
+        return true;
+    }
+
+    token.text += _input.get();
+    token.type = Token::Type::AppendRedirection;
+    return true;
+}
+
 bool Tokenizer::nextScope(Token& token)
 {
     // Scope tokens are left and right parentheses
@@ -224,7 +267,7 @@ bool Tokenizer::nextDirectWord(Token& token)
             }
 
             if (c == '#' || c == ';' || c == '&' || c == '|' ||
-                    c == '(' || c == ')') {
+                    c == '(' || c == ')' || c == '<' || c == '>') {
                 return false;
             }
         }

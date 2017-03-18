@@ -14,39 +14,40 @@
 // ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS
 // SOFTWARE.
 
-#include "ExecutorStreamSet.hpp"
-#include "ExecutorPipe.hpp"
-#include "ExecutorStream.hpp"
+#include "PosixExecutorInputFileStream.hpp"
+#include <cstdlib>
+#include <stdexcept>
+#include <fcntl.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 namespace rshell {
 
-void ExecutorStreamSet::insert(ExecutorPipe& pipe)
+PosixExecutorInputFileStream::PosixExecutorInputFileStream(
+        const std::string& path)
+    : ExecutorStream{Mode::Input}
+    , _file(::open(path.c_str(), O_RDONLY))
 {
-    insert(pipe.inputStream());
-    insert(pipe.outputStream());
-}
-
-void ExecutorStreamSet::insert(ExecutorStream& stream)
-{
-    _streams.insert(&stream);
-}
-
-void ExecutorStreamSet::erase(ExecutorPipe& pipe)
-{
-    erase(pipe.inputStream());
-    erase(pipe.outputStream());
-}
-
-void ExecutorStreamSet::erase(ExecutorStream& stream)
-{
-    _streams.erase(&stream);
-}
-
-void ExecutorStreamSet::close()
-{
-    for (auto&& stream : _streams) {
-        stream->close();
+    if (_file == -1) {
+        std::perror("rshell: unable to open input file");
+        throw std::runtime_error{"unable to open input file"};
     }
+}
+
+PosixExecutorInputFileStream::~PosixExecutorInputFileStream()
+{
+    close();
+}
+
+void PosixExecutorInputFileStream::activate(Executor& executor)
+{
+    ::dup2(_file, STDIN_FILENO);
+}
+
+void PosixExecutorInputFileStream::close()
+{
+    ::close(_file);
 }
 
 } // namespace rshell
