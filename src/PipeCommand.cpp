@@ -106,7 +106,11 @@ int PipeCommand::execute(Executor& executor, WaitMode waitMode)
         pipeSet.activate(pipe++);
 
         if (command == commands.back()) {
-            return command->execute(executor, WaitMode::Wait);
+            // After execution, reset the input/output streams for future use
+            auto exitCode = command->execute(executor, WaitMode::Wait);
+            executor.setInputStream(nullptr);
+            executor.setOutputStream(nullptr);
+            return exitCode;
         }
 
         command->execute(executor, WaitMode::Continue);
